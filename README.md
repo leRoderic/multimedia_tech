@@ -1,11 +1,8 @@
 # Multimedia Technologies '21 @ UB
 ---
 
-## E1 - Music codification:
-- Delivery: **12/3 15.00h**
-
-## E2 - Huffman codification:
-- Delivery: **19/3 15.00h**
+## E2b - Huffman codification:
+- Delivery: **25/3 9.00h**
 
 ## E3 - LZ77 codification:
 - Delivery: **26/3 15.00h**
