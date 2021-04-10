@@ -22,6 +22,11 @@ public class ArgParser {
             validateWith = FileExists.class)
     private String inputZip;
 
+    @Parameter(names = {"--outputPath", "-p"},
+            required = false,
+            description = "Output path to save the images")
+    private String outputPath;
+
     @Parameter(names = {"--numericParameter", "-np"},
             required = true,
             description = "A number used as a parameter",
@@ -40,6 +45,10 @@ public class ArgParser {
 
     public String getInputZipPath() {
         return inputZip;
+    }
+
+    public String getOutputPath() {
+        return outputPath;
     }
 
     public static enum numParamLIMITS {
