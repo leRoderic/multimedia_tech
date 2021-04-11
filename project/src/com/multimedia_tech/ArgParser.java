@@ -68,7 +68,7 @@ public class ArgParser {
             description = "Lists all options available", help = true)
     public boolean help;
 
-    public String getInputZipPath() {
+    public String getInputZip() {
         return inputZip;
     }
 

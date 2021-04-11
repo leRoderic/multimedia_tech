@@ -20,8 +20,6 @@ public class Main {
     public static void main(String[] args) {
 
         String[] test_args = {"--verbose", "4", "--inputZip", "images/Cubo.zip", "--outputPath" , "images/CuboGuardado.zip" ,"--debug", "-np", "500"};
-        //String[] test_args = {"--verbose", "4", "--debug", "-np", "2500"};
-        //String[] test_args = {"-h"};
 
         ArgParser parser = new ArgParser();
         JCommander jComm = null;
@@ -33,7 +31,13 @@ public class Main {
             if (parser.help) {
                 jComm.usage();
             }
-        }catch (ParameterException pex){
+            readZip(parser.getInputZip());
+
+            if(parser.getOutputPath() != null){
+                System.out.println("ASDASDASD");
+                saveZip(parser.getOutputPath());
+            }
+        }catch (ParameterException | IOException pex){
             System.err.println(pex.getMessage());
             System.err.println("Try --help or -h for help.");
         }
@@ -57,9 +61,9 @@ public class Main {
         f.close();
     }
 
-    //Funcion encargada de crear la carpeta zip
-    public static void saveZip(String path) throws IOException{
-        FileOutputStream fileOS = new FileOutputStream(path);
+    //Funcion encargada de crear el fichero zip
+    public static void saveZip(String fname) throws IOException{
+        FileOutputStream fileOS = new FileOutputStream(fname);
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
 
         for (int i =0; i< imageNames.size(); i++) {
@@ -74,10 +78,10 @@ public class Main {
     }
 
     //Función para guardar imagen en la carpeta zip
-    public static void createFileToZip(String pathName, ZipOutputStream zipOS) throws FileNotFoundException, IOException {
-        File f = new File(pathName);
+    public static void createFileToZip(String fileName, ZipOutputStream zipOS) throws FileNotFoundException, IOException {
+        File f = new File(fileName);
         FileInputStream fis = new FileInputStream(f);
-        ZipEntry zipEntry = new ZipEntry(pathName);
+        ZipEntry zipEntry = new ZipEntry(fileName);
         zipOS.putNextEntry(zipEntry);
         byte[] bytes = new byte[1024];
         int length;
