@@ -4,51 +4,116 @@ import com.beust.jcommander.Parameter;
 
 public class ArgParser {
 
-    @Parameter(names = { "--help", "-h" },
-            description = "Prints a help message", help = true)
-    public boolean help;
-
-    @Parameter(names = "--debug",
-            description = "Debug mode")
-    private boolean debug = false;
-
-    @Parameter(names = { "--verbose" },
-            description = "Level of verbosity")
-    private int verbose = 1;
-
-    @Parameter(names = {"--inputZip", "-i"},
-            required = false,
-            description = "Zip file with the input images",
+    @Parameter(names = {"--input", "-i"},
+            required = true,
+            description = "Input file. Mandatory.",
             validateWith = FileExists.class)
     private String inputZip;
 
-    @Parameter(names = {"--outputPath", "-p"},
+    @Parameter(names = {"--output", "-o"},
             required = false,
-            description = "Output path to save the images")
-    private String outputPath;
+            description = "Name of the file that will contain the images and necessary info for the codification")
+    private String outputName;
 
-    @Parameter(names = {"--numericParameter", "-np"},
-            required = true,
-            description = "A number used as a parameter",
-            validateWith = NumInRange.class)
-    private int numParam = 0;
+    @Parameter(names = {"--encode", "-e"},
+            required = false,
+            description = "Apply a codec to the input file")
+    private String codec;
 
+    @Parameter(names = {"--decode", "-d"},
+            required = false,
+            description = "Decode and reproduce the input file")
+    private boolean decode;
 
+    @Parameter(names = {"--fps"},
+            required = false,
+            description = "FPS that the video will reproduced")
+    private int fps;
 
-    public boolean getDebug() {
-        return debug;
-    }
+    @Parameter(names = {"--binarization"},
+            required = false,
+            description = "Filter of binarization (used if indicated)")
+    private String binFilter;
 
-    public int getVerboseLevel() {
-        return verbose;
-    }
+    @Parameter(names = { "--negative"},
+            description = "Apply a negative filter to the images")
+    public boolean negative;
+
+    @Parameter(names = {"--averaging"},
+            required = false,
+            description = "Apply a meaning filter in places of value x value")
+    private int avg;
+
+    @Parameter(names = {"--nTiles"},
+            required = false,
+            description = "Tesselation, number of divisions of the image.")
+    private String nTiles;
+
+    @Parameter(names = {"--seekRange"},
+            required = false,
+            description = "Maximum displacement when applying tesselation")
+    private int seekRange;
+
+    @Parameter(names = {"--GOP"},
+            required = false,
+            description = "Maximum number of images between two reference frames")
+    private int gop;
+
+    @Parameter(names = {"--quality"},
+            required = false,
+            description = "Quality factor for tesselation")
+    private int quality;
+
+    @Parameter(names = { "--help", "-h" },
+            description = "Lists all options available", help = true)
+    public boolean help;
 
     public String getInputZipPath() {
         return inputZip;
     }
 
     public String getOutputPath() {
-        return outputPath;
+        return outputName;
+    }
+
+    public String getCodec(){
+        return codec;
+    }
+
+    public boolean getDecodeOption(){
+        return decode;
+    }
+
+    public int getFPS(){
+        return fps;
+    }
+
+    public String getBinarizationFilter(){
+        return binFilter;
+    }
+
+    public boolean getNegativeOption(){
+        return negative;
+    }
+
+    public int getAVGFilterValue(){
+        return avg;
+    }
+
+    public String getTesselationValues(){
+        return nTiles;
+    }
+
+    public int getSeekRange(){
+        return seekRange;
+    }
+
+    public int getGOP(){
+        return gop;
+    }
+
+    public int getQuality(){
+        return quality;
     }
 
     public static enum numParamLIMITS {
@@ -62,9 +127,5 @@ public class ArgParser {
         public int getValue() {
             return value;
         }
-    }
-
-    public int getNumParam() {
-        return numParam;
     }
 }

@@ -27,28 +27,13 @@ public class Main {
         JCommander jComm = null;
 
         try{
-            jComm = new JCommander(parser, test_args);
-            jComm.setProgramName("TM1516_P2.jar");
+            jComm = new JCommander(parser, args);
+            jComm.setProgramName("AUAUVR.jar");
 
             if (parser.help) {
                 jComm.usage();
-            }else{
-                System.out.println("Verbose level: " + parser.getVerboseLevel());
-                System.out.println("Working with: " + parser.getInputZipPath());
-                System.out.println("Debug mode: " + parser.getDebug());
-                System.out.println("NumParameter: " + parser.getNumParam());
-
-                System.out.println("-----------------------");
-                System.out.println("Leyendo carpeta");
-                readZip(parser.getInputZipPath());
-
-                System.out.println("Guardando imagenes en: " + parser.getOutputPath());
-
-                saveZip(parser.getOutputPath());
-
-
             }
-        }catch (ParameterException | IOException pex){
+        }catch (ParameterException pex){
             System.err.println(pex.getMessage());
             System.err.println("Try --help or -h for help.");
         }
