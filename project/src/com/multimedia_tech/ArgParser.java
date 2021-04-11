@@ -33,7 +33,12 @@ public class ArgParser {
     @Parameter(names = {"--binarization"},
             required = false,
             description = "Filter of binarization (used if indicated)")
-    private String binFilter;
+    private int binFilter;
+
+    @Parameter(names = {"--grayscale"},
+            required = false,
+            description = "Convert images to grayscale")
+    private boolean grayScale;
 
     @Parameter(names = { "--negative"},
             description = "Apply a negative filter to the images")
@@ -88,7 +93,7 @@ public class ArgParser {
         return fps;
     }
 
-    public String getBinarizationFilter(){
+    public int getBinarizationFilter(){
         return binFilter;
     }
 
@@ -98,6 +103,10 @@ public class ArgParser {
 
     public int getAVGFilterValue(){
         return avg;
+    }
+
+    public boolean getGrayScaleOption(){
+        return grayScale;
     }
 
     public String getTesselationValues(){

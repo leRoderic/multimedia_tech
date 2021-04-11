@@ -26,6 +26,19 @@ public class Main {
             if(parser.getFPS() != 0){
                 fps = parser.getFPS();
             }
+            if(parser.getNegativeOption()){
+                fo.applyNegativeFilter();
+            }
+            if(parser.getAVGFilterValue() != 0){
+                fo.applyMeanFilter(parser.getAVGFilterValue());
+            }
+            if(parser.getGrayScaleOption()){
+                fo.applyGrayScaleFilter();
+            }
+            if(parser.getBinarizationFilter() != 0){
+                fo.applyBinarizationFilter(parser.getBinarizationFilter());
+            }
+
             FramesViewer fv = new FramesViewer(fo, fps);
             fv.run();
 
