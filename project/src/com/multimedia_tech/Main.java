@@ -21,7 +21,7 @@ public class Main {
         ArgParser parser = new ArgParser();
         JCommander jComm = null;
         FileManager fm = FileManager.getInstance();
-
+        int fps = 24;
         try{
             jComm = new JCommander(parser, args);
             jComm.setProgramName("AUAUVR.jar");
@@ -31,6 +31,13 @@ public class Main {
             }
             fm.loadZipImages(parser.getInputZip());
             FramesObject fo = fm.getOrderedFrames();
+            if(parser.getFPS() != 0){
+                fps = parser.getFPS();
+            }
+            System.out.println(fps);
+            FramesViewer fv = new FramesViewer(fo, fps);
+            fv.run();
+
             if(parser.getOutputPath() != null){
                 fm.saveImagesToZip(parser.getOutputPath());
             }
