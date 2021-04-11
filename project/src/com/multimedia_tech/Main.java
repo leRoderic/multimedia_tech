@@ -16,8 +16,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String[] test_args = {"--verbose", "4", "--inputZip", "images/Cubo.zip", "--outputPath" , "images/CuboGuardado.zip" ,"--debug", "-np", "500"};
-
         ArgParser parser = new ArgParser();
         JCommander jComm = null;
         FileManager fm = FileManager.getInstance();
@@ -34,7 +32,6 @@ public class Main {
             if(parser.getFPS() != 0){
                 fps = parser.getFPS();
             }
-            System.out.println(fps);
             FramesViewer fv = new FramesViewer(fo, fps);
             fv.run();
 
