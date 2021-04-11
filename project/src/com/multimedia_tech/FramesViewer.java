@@ -12,17 +12,20 @@ public class FramesViewer extends JFrame implements Runnable {
     private int fps;
     private ArrayList<BufferedImage> images;
     public JLabel window;
+    private String framesTitle;
 
     public FramesViewer(FramesObject fo, int framesPerSecond){
         images = fo.getFrames();
+        framesTitle = fo.getName();
         fps = framesPerSecond;
         window = new JLabel();
     }
 
     private void configWindow(){
+        setTitle("Reproducing " + framesTitle + " at " + fps + " FPS");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         BufferedImage fFrame = images.get(0);
-        setPreferredSize(new Dimension(fFrame.getWidth() + 50, fFrame.getHeight() + 50));
+        setPreferredSize(new Dimension(fFrame.getWidth() + 80, fFrame.getHeight() + 80));
         window.setHorizontalAlignment(JLabel.CENTER);
         getContentPane().add(window, BorderLayout.CENTER);
         pack();

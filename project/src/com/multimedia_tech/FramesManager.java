@@ -8,24 +8,26 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
-public class FileManager {
+public class FramesManager {
 
-    private static FileManager mgr = new FileManager();
+    private static FramesManager mgr = new FramesManager();
     private ArrayList<String> imageNames;
     private Map<String, BufferedImage> images;
+    private String fName;
 
-    private FileManager(){
+    private FramesManager(){
         images = new HashMap<>();
         imageNames = new ArrayList<>();
+        fName = "";
     }
 
-    public static FileManager getInstance(){
+    public static FramesManager getInstance(){
         return mgr;
     }
 
     public void loadZipImages(String inputZip) throws IOException {
         ZipFile f = new ZipFile(new File(inputZip));
-
+        fName = f.getName();
         Enumeration<? extends ZipEntry> entries = f.entries();
         while(entries.hasMoreElements()){
             ZipEntry entry = entries.nextElement();
@@ -43,7 +45,7 @@ public class FileManager {
         for(String n: imageNames){
             ret.add(images.get(n));
         }
-        return new FramesObject(ret);
+        return new FramesObject(ret, fName);
     }
 
     public void saveImagesToZip(String fname) throws IOException{

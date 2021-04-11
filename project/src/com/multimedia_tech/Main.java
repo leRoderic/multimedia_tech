@@ -4,13 +4,7 @@ package com.multimedia_tech;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 public class Main {
 
@@ -18,7 +12,7 @@ public class Main {
 
         ArgParser parser = new ArgParser();
         JCommander jComm = null;
-        FileManager fm = FileManager.getInstance();
+        FramesManager fm = FramesManager.getInstance();
         int fps = 24;
         try{
             jComm = new JCommander(parser, args);
