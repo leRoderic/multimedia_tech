@@ -49,6 +49,11 @@ public class ArgParser {
             description = "Apply a meaning filter in places of value x value")
     private int avg;
 
+    @Parameter(names = {"--edgeDetection"},
+            required = false,
+            description = "Apply a edge detection filter to the image")
+    private boolean edge;
+
     @Parameter(names = {"--nTiles"},
             required = false,
             description = "Tesselation, number of divisions of the image.")
@@ -107,6 +112,10 @@ public class ArgParser {
 
     public boolean getGrayScaleOption(){
         return grayScale;
+    }
+
+    public boolean getEdgeDetectionOption(){
+        return edge;
     }
 
     public String getTesselationValues(){
