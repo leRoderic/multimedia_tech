@@ -168,9 +168,7 @@ public class FramesObject {
         int g = (rgb >> 8) & 0xff;
         int b = (rgb) & 0xff;
 
-        //from https://en.wikipedia.org/wiki/Grayscale, calculating luminance
         int gray = (int)(0.2126 * r + 0.7152 * g + 0.0722 * b);
-        //int gray = (r + g + b) / 3;
 
         return gray;
     }
