@@ -36,13 +36,14 @@ public class FramesObject {
     }
 
     public void applyMeanFilter(int val) {
-        int red, green, blue;
+        int alpha,red, green, blue;
         int vals[];
         Color col;
         for (BufferedImage i : frames) {
             vals = new int[i.getWidth() * i.getHeight()];
             for (int y = 0; y < i.getHeight(); y++) {
                 for (int x = 0; x < i.getWidth(); x++) {
+                    alpha = 0;
                     red = 0;
                     green = 0;
                     blue = 0;
@@ -54,6 +55,7 @@ public class FramesObject {
                                 continue;
                             } else {
                                 col = new Color(i.getRGB(c, r));
+                                alpha += col.getAlpha();
                                 red += col.getRed();
                                 green += col.getGreen();
                                 blue += col.getBlue();
@@ -61,14 +63,13 @@ public class FramesObject {
                             }
                         }
                     }
-                                        
-                    //int p = dyimagefx.PixMath.getPixel(alpha / count, red / count, green / count, blue / count);
-                    //vals[x + y * i.getWidth()] = p;
+                    int p = ((alpha/count)<<24) | ((red/count)<<16) | ((green/count)<<8) | (blue/count);
+                    vals[x + y * i.getWidth()] = p;
                 }
             }
             for (int y = 0; y < i.getHeight(); y++) {
                 for (int x = 0; x < i.getWidth(); x++) {
-                    //i.setRGB(x, y, new Color(vals[x + y + i.getWidth()], vals[x + y + i.getWidth()], vals[x + y + i.getWidth()]));
+                    i.setRGB(x, y,vals[x + (y * i.getWidth())]);
                 }
             }
         }
