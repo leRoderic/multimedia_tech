@@ -36,13 +36,14 @@ public class FramesObject {
     }
 
     public void applyMeanFilter(int val) {
-        int red, green, blue;
+        int alpha,red, green, blue;
         int vals[];
         Color col;
         for (BufferedImage i : frames) {
             vals = new int[i.getWidth() * i.getHeight()];
             for (int y = 0; y < i.getHeight(); y++) {
                 for (int x = 0; x < i.getWidth(); x++) {
+                    alpha = 0;
                     red = 0;
                     green = 0;
                     blue = 0;
@@ -54,6 +55,7 @@ public class FramesObject {
                                 continue;
                             } else {
                                 col = new Color(i.getRGB(c, r));
+                                alpha += col.getAlpha();
                                 red += col.getRed();
                                 green += col.getGreen();
                                 blue += col.getBlue();
@@ -61,14 +63,13 @@ public class FramesObject {
                             }
                         }
                     }
-                                        
-                    //int p = dyimagefx.PixMath.getPixel(alpha / count, red / count, green / count, blue / count);
-                    //vals[x + y * i.getWidth()] = p;
+                    int p = ((alpha/count)<<24) | ((red/count)<<16) | ((green/count)<<8) | (blue/count);
+                    vals[x + y * i.getWidth()] = p;
                 }
             }
             for (int y = 0; y < i.getHeight(); y++) {
                 for (int x = 0; x < i.getWidth(); x++) {
-                    //i.setRGB(x, y, new Color(vals[x + y + i.getWidth()], vals[x + y + i.getWidth()], vals[x + y + i.getWidth()]));
+                    i.setRGB(x, y,vals[x + (y * i.getWidth())]);
                 }
             }
         }
@@ -109,5 +110,66 @@ public class FramesObject {
                 }
             }
         }
+    }
+
+    public void applyEdgeDetectionFilter() {
+        int maxGradient = -1;
+        for (BufferedImage i : frames) {
+            int[][] edgeColors = new int[i.getWidth()][i.getHeight()];
+            for (int x = 1; x < i.getWidth() - 1; x++) {
+                for (int y = 1; y < i.getHeight() - 1; y++) {
+
+                    int val00 = getGrayScale(i.getRGB(x - 1, y - 1));
+                    int val01 = getGrayScale(i.getRGB(x - 1, y));
+                    int val02 = getGrayScale(i.getRGB(x - 1, y + 1));
+
+                    int val10 = getGrayScale(i.getRGB(x, y - 1));
+                    int val11 = getGrayScale(i.getRGB(x, y));
+                    int val12 = getGrayScale(i.getRGB(x, y + 1));
+
+                    int val20 = getGrayScale(i.getRGB(x + 1, y - 1));
+                    int val21 = getGrayScale(i.getRGB(x + 1, y));
+                    int val22 = getGrayScale(i.getRGB(x + 1, y + 1));
+
+                    int gx =  ((-1 * val00) + (0 * val01) + (1 * val02))
+                            + ((-2 * val10) + (0 * val11) + (2 * val12))
+                            + ((-1 * val20) + (0 * val21) + (1 * val22));
+
+                    int gy =  ((-1 * val00) + (-2 * val01) + (-1 * val02))
+                            + ((0 * val10) + (0 * val11) + (0 * val12))
+                            + ((1 * val20) + (2 * val21) + (1 * val22));
+
+                    double gval = Math.sqrt((gx * gx) + (gy * gy));
+                    int g = (int) gval;
+
+                    if(maxGradient < g) {
+                        maxGradient = g;
+                    }
+
+                    edgeColors[x][y] = g;
+                }
+            }
+            double scale = 255.0 / maxGradient;
+
+            for (int x = 1; x < i.getWidth() - 1; x++) {
+                for (int y = 1; y < i.getHeight() - 1; y++) {
+                    int edgeColor = edgeColors[x][y];
+                    edgeColor = (int)(edgeColor * scale);
+                    edgeColor = 0xff000000 | (edgeColor << 16) | (edgeColor << 8) | edgeColor;
+
+                    i.setRGB(x, y, edgeColor);
+                }
+            }
+        }
+    }
+
+    public static int  getGrayScale(int rgb) {
+        int r = (rgb >> 16) & 0xff;
+        int g = (rgb >> 8) & 0xff;
+        int b = (rgb) & 0xff;
+
+        int gray = (int)(0.2126 * r + 0.7152 * g + 0.0722 * b);
+
+        return gray;
     }
 }

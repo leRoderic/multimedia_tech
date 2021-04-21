@@ -38,6 +38,9 @@ public class Main {
             if(parser.getBinarizationFilter() != 0){
                 fo.applyBinarizationFilter(parser.getBinarizationFilter());
             }
+            if(parser.getEdgeDetectionOption()){
+                fo.applyEdgeDetectionFilter();
+            }
 
             FramesViewer fv = new FramesViewer(fo, fps);
             fv.run();
