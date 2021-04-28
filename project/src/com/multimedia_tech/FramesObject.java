@@ -217,6 +217,8 @@ public class FramesObject {
     /**
      * Función soporte para aplicar grayscale a un píxel
      *
+     * @return int grayscale
+     *
      * */
     public static int  getGrayScale(int rgb) {
         int r = (rgb >> 16) & 0xff;
