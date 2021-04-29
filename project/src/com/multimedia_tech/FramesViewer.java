@@ -21,17 +21,28 @@ public class FramesViewer extends JFrame implements Runnable {
         window = new JLabel();
     }
 
+    /**
+     * Función para configurar el JFrame que contendrá la reproducción
+     *
+     */
     private void configWindow(){
+        // Establecemos titulo para la ventana y el frame a mostrar
         setTitle("Reproducing " + framesTitle + " at " + fps + " FPS");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         BufferedImage fFrame = images.get(0);
+        // Redimensionamos la ventanta para mostrar correctamente el frame
         setPreferredSize(new Dimension(fFrame.getWidth() + 80, fFrame.getHeight() + 80));
         window.setHorizontalAlignment(JLabel.CENTER);
         getContentPane().add(window, BorderLayout.CENTER);
         pack();
+        // Mostramos la ventana
         setVisible(true);
     }
 
+    /**
+     * Función para configurar la reproducción con los FPS introducidos por el usuario
+     *
+     */
     private void reproduce(){
         for(BufferedImage i: images){
             window.setIcon(new ImageIcon(i));
