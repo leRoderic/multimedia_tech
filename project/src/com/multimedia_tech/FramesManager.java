@@ -15,13 +15,13 @@ public class FramesManager {
     private Map<String, BufferedImage> images;
     private String fName;
 
-    private FramesManager(){
+    private FramesManager() {
         images = new HashMap<>();
         imageNames = new ArrayList<>();
         fName = "";
     }
 
-    public static FramesManager getInstance(){
+    public static FramesManager getInstance() {
         return mgr;
     }
 
@@ -29,8 +29,7 @@ public class FramesManager {
      * Función para leer un archivo ZIP de imágenes
      *
      * @param inputZip -> Nombre del archivo ZIP
-     *
-     * */
+     */
     public void loadZipImages(String inputZip) throws IOException {
 
         // Cargamos el ZIP i sus respectivas entradas/imágenes
@@ -38,7 +37,7 @@ public class FramesManager {
         fName = f.getName();
         Enumeration<? extends ZipEntry> entries = f.entries();
         // Recorremos cada una de las imágenes de entrada y las cargamos en un HashMap junto con su nombre
-        while(entries.hasMoreElements()){
+        while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
             BufferedImage img = ImageIO.read(inStr);
@@ -54,11 +53,10 @@ public class FramesManager {
      * Función que retorna los frames del video
      *
      * @return frames
-     *
-     * */
-    public FramesObject getOrderedFrames(){
+     */
+    public FramesObject getOrderedFrames() {
         ArrayList<BufferedImage> ret = new ArrayList<>();
-        for(String n: imageNames){
+        for (String n : imageNames) {
             ret.add(images.get(n));
         }
         return new FramesObject(ret, fName);
@@ -68,28 +66,27 @@ public class FramesManager {
      * Función para guardar imagenes en un archivo ZIP
      *
      * @param fname -> Nombre del archivo de salida
-     *
-     * */
-    public void saveImagesToZip(String fname, ArrayList<Byte> data) throws IOException{
-        if(fname == null){
+     */
+    public void saveImagesToZip(String fname, ArrayList<Byte> data) throws IOException {
+        if (fname == null) {
             fname = "out";
         }
-        FileOutputStream fileOS = new FileOutputStream(fname + ".zip");
+        FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
         // Para cada imagen, creamos un fichero jpeg temporal,
         // el cual se añadirá al archivo zip mediante la función createFileToZip
         // Finalmente, este fichero se elimina
-        for (int i =0; i< imageNames.size(); i++) {
-            String pathName = "img_" + i + ".jpg";
+        for (int i = 0; i < imageNames.size(); i++) {
+            String pathName = "img_" + String.format("%0" + String.valueOf(imageNames.size() - 1).length() + "d", i) + ".jpg";
             File tempImage = new File(pathName);
-            ImageIO.write(images.get(imageNames.get(i)),"jpg", tempImage);
+            ImageIO.write(images.get(imageNames.get(i)), "jpg", tempImage);
             createFileToZip(images.get(imageNames.get(i)), pathName, zipOS);
             tempImage.delete();
         }
 
         byte d[] = new byte[data.size()];
-        for(int i = 0; i<data.size(); i++){
-          d[i]=data.get(i);
+        for (int i = 0; i < data.size(); i++) {
+            d[i] = data.get(i);
         }
         ZipEntry f = new ZipEntry("aor.data");
         zipOS.putNextEntry(f);
@@ -101,17 +98,17 @@ public class FramesManager {
         zipOS.close();
     }
 
-    public void saveImagesToZip(String fname) throws IOException{
+    public void saveImagesToZip(String fname) throws IOException {
 
         FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
         // Para cada imagen, creamos un fichero jpeg temporal,
         // el cual se añadirá al archivo zip mediante la función createFileToZip
         // Finalmente, este fichero se elimina
-        for (int i =0; i< imageNames.size(); i++) {
-            String pathName = "img_" + i + ".jpg";
+        for (int i = 0; i < imageNames.size(); i++) {
+            String pathName = "img_" + String.format("%0" + String.valueOf(imageNames.size() - 1).length() + "d", i) + ".jpg";
             File tempImage = new File(pathName);
-            ImageIO.write(images.get(imageNames.get(i)),"jpg", tempImage);
+            ImageIO.write(images.get(imageNames.get(i)), "jpg", tempImage);
             createFileToZip(images.get(imageNames.get(i)), pathName, zipOS);
             tempImage.delete();
         }
@@ -125,9 +122,8 @@ public class FramesManager {
      * Función para guardar imagen en el archivo ZIP
      *
      * @param fileName -> Nombre de la imagen;
-     * @param zipOS -> Archivo ZIP de salida
-     *
-     * */
+     * @param zipOS    -> Archivo ZIP de salida
+     */
     private void createFileToZip(BufferedImage i, String fileName, ZipOutputStream zipOS) throws FileNotFoundException, IOException {
         // Creamos la imagen y el input stream
         File f = new File(fileName);
