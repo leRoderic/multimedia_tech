@@ -93,6 +93,8 @@ public class ArgParser {
     }
 
     public String getOutputPath() {
+        if(outputName == null)
+            return "out";
         return outputName;
     }
 
@@ -149,14 +151,20 @@ public class ArgParser {
     }
 
     public int getSeekRange() {
+        if(gop == 0)
+            return 4;
         return seekRange;
     }
 
     public int getGOP() {
+        if(gop == 0)
+            return 5;
         return gop;
     }
 
     public int getQuality() {
+        if(gop == 0)
+            return 5;
         return quality;
     }
 

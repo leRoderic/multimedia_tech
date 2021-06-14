@@ -1,7 +1,7 @@
 package com.multimedia_tech;
 
-import org.xeustechnologies.jtar.TarEntry;
-import org.xeustechnologies.jtar.TarInputStream;
+/*import org.xeustechnologies.jtar.TarEntry;
+import org.xeustechnologies.jtar.TarInputStream;*/
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -250,8 +250,13 @@ public class FramesObject {
         BufferedImage[] reference = null;
 
         for (int i = 0; i < frames.size(); i++) {
+            if(frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0){
+                System.out.println("Error> Specified tesselation parameters bigger than image");
+                System.exit(-1);
+            }
             int rows = frames.get(i).getWidth() / xTiles;
             int cols = frames.get(i).getHeight() / yTiles;
+
             if (i % gop != 0) {
                 // Código imagénes intercuadro
                 matchCoordinates = new ArrayList<>();
@@ -268,11 +273,12 @@ public class FramesObject {
                 } else {
                     data.add((byte) (coincidence & 0xff));
                     data.add((byte) ((coincidence >> 8) & 0xff));
-                    int x, y, r = 0, g = 0, b = 0;
+                    int x, y;
                     for (int m = 0; m < matchCoordinates.size(); m++) {
-                        x = matchCoordinates.get(i)[0];
-                        y = matchCoordinates.get(i)[1];
+                        x = matchCoordinates.get(m)[0];
+                        y = matchCoordinates.get(m)[1];
                         int[] colors = frames.get(i).getRGB(x, y, xTiles, yTiles, null, 0, xTiles*yTiles);
+                        int r = 0, g = 0, b = 0;
                         for (int c : colors) {
                             r += ((c >> 16) & 0xFF);
                             g += ((c >> 8) & 0xFF);
@@ -384,7 +390,7 @@ public class FramesObject {
         return a1 * a2 * Math.sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
     }
 
-    public static ArrayList<BufferedImage> decode(File packed) {
+    /*public static ArrayList<BufferedImage> decode(File packed) {
         System.out.println("@decode receives " + packed.getName());
         try {
             decompress(packed);
@@ -446,7 +452,7 @@ public class FramesObject {
         }
 
         return output;
-    }
+    }*/
 
 
 }

@@ -51,17 +51,17 @@ public class Main {
             }
 
             if(parser.getEncodeOption()){{
-                if (parser.getOutputPath() != null)
+                if (parser.getOutputPath() == null)
                     System.err.println("Add output file");
                 }
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Byte> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
                 fm.saveImagesToZip(parser.getOutputPath(), ret);
+            }else{
+                if(parser.getOutputPath() != null){
+                    fm.saveImagesToZip(parser.getOutputPath());
+                }
             }
-
-            /* if(parser.getOutputPath() != null){
-                fm.saveImagesToZip(parser.getOutputPath());
-            }*/
         }catch (ParameterException | IOException pex){
             System.err.println(pex.getMessage());
             System.err.println("Try --help or -h for help.");

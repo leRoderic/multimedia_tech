@@ -99,6 +99,26 @@ public class FramesManager {
         zipOS.close();
     }
 
+    public void saveImagesToZip(String fname) throws IOException{
+
+        FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
+        ZipOutputStream zipOS = new ZipOutputStream(fileOS);
+        // Para cada imagen, creamos un fichero jpeg temporal,
+        // el cual se añadirá al archivo zip mediante la función createFileToZip
+        // Finalmente, este fichero se elimina
+        for (int i =0; i< imageNames.size(); i++) {
+            String pathName = "img_" + Integer.toString(i) + ".jpg";
+            File tempImage = new File(pathName);
+            ImageIO.write(images.get(imageNames.get(i)),"jpg",tempImage);
+            createFileToZip(pathName, zipOS);
+            tempImage.delete();
+        }
+
+        // Cerramos OutputsStreams
+        zipOS.finish();
+        zipOS.close();
+    }
+
     /**
      * Función para guardar imagen en el archivo ZIP
      *
