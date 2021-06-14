@@ -5,6 +5,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 import java.io.*;
+import java.util.List;
 
 public class Main {
 
@@ -42,8 +43,10 @@ public class Main {
                 fo.applyEdgeDetectionFilter();
             }
 
-            FramesViewer fv = new FramesViewer(fo, fps);
-            fv.run();
+            if(!parser.getBatchOption()) {
+                FramesViewer fv = new FramesViewer(fo, fps);
+                fv.run();
+            }
 
             if(parser.getOutputPath() != null){
                 fm.saveImagesToZip(parser.getOutputPath());

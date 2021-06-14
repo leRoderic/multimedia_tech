@@ -72,7 +72,7 @@ public class FramesManager {
      * */
     public void saveImagesToZip(String fname) throws IOException{
 
-        FileOutputStream fileOS = new FileOutputStream(fname + ".zip");
+        FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
         // Para cada imagen, creamos un fichero jpeg temporal,
         // el cual se añadirá al archivo zip mediante la función createFileToZip

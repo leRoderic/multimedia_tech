@@ -1,6 +1,10 @@
 package com.multimedia_tech;
 
+import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArgParser {
 
@@ -18,7 +22,7 @@ public class ArgParser {
     @Parameter(names = {"--encode", "-e"},
             required = false,
             description = "Apply a codec to the input file")
-    private String codec;
+    private boolean encode;
 
     @Parameter(names = {"--decode", "-d"},
             required = false,
@@ -40,7 +44,7 @@ public class ArgParser {
             description = "Convert images to grayscale")
     private boolean grayScale;
 
-    @Parameter(names = { "--negative"},
+    @Parameter(names = {"--negative"},
             description = "Apply a negative filter to the images")
     public boolean negative;
 
@@ -54,9 +58,14 @@ public class ArgParser {
             description = "Apply a edge detection filter to the image")
     private boolean edge;
 
+    @Parameter(names = {"--batch", "-b"},
+            required = false,
+            description = "Dismiss video popup window")
+    private boolean batch;
+
     @Parameter(names = {"--nTiles"},
             required = false,
-            description = "Tesselation, number of divisions of the image.")
+            description = "Tesselation, number of divisions of the images for each axis. Format --nTiles xAxis,yAxis")
     private String nTiles;
 
     @Parameter(names = {"--seekRange"},
@@ -74,7 +83,7 @@ public class ArgParser {
             description = "Quality factor for tesselation")
     private int quality;
 
-    @Parameter(names = { "--help", "-h" },
+    @Parameter(names = {"--help", "-h"},
             description = "Lists all options available", help = true)
     public boolean help;
 
@@ -86,51 +95,61 @@ public class ArgParser {
         return outputName;
     }
 
-    public String getCodec(){
-        return codec;
+    public boolean getEncodeOption() {
+        return encode;
     }
 
-    public boolean getDecodeOption(){
+    public boolean getDecodeOption() {
         return decode;
     }
 
-    public int getFPS(){
+    public int getFPS() {
         return fps;
     }
 
-    public int getBinarizationFilter(){
+    public int getBinarizationFilter() {
         return binFilter;
     }
 
-    public boolean getNegativeOption(){
+    public boolean getBatchOption() {
+        return batch;
+    }
+
+    public boolean getNegativeOption() {
         return negative;
     }
 
-    public int getAVGFilterValue(){
+    public int getAVGFilterValue() {
         return avg;
     }
 
-    public boolean getGrayScaleOption(){
+    public boolean getGrayScaleOption() {
         return grayScale;
     }
 
-    public boolean getEdgeDetectionOption(){
+    public boolean getEdgeDetectionOption() {
         return edge;
     }
 
-    public String getTesselationValues(){
-        return nTiles;
+    public List<Integer> getTesselationValues() {
+        String asd = nTiles;
+        String [] vals = nTiles.split(",");
+        List<Integer> list = new ArrayList<>();
+        for(String i: vals){
+            list.add(Integer.parseInt(i));
+        }
+        return list;
     }
 
-    public int getSeekRange(){
+    public int getSeekRange() {
         return seekRange;
     }
 
-    public int getGOP(){
+    public int getGOP() {
         return gop;
     }
 
-    public int getQuality(){
+    public int getQuality() {
         return quality;
     }
 
@@ -138,6 +157,7 @@ public class ArgParser {
         MAX(1000), MIN(0);
 
         private int value;
+
         private numParamLIMITS(int v) {
             value = v;
         }
@@ -146,4 +166,5 @@ public class ArgParser {
             return value;
         }
     }
+
 }

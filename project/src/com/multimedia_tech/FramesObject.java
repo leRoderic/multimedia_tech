@@ -229,4 +229,18 @@ public class FramesObject {
 
         return gray;
     }
+
+    public void encode(int quality, int gop, int seekRange, int nTiles){
+        for (BufferedImage i : frames) {
+            //i.getSubimage()
+        }
+    }
+
+    /*public ArrayList subdivideFrames(int gop){
+        ArrayList ArrayList<BufferedImage> arr = new ArrayList();
+
+        return arr;
+    }*/
+
+
 }
