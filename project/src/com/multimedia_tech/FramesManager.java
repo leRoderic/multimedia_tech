@@ -41,13 +41,14 @@ public class FramesManager {
         while(entries.hasMoreElements()){
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
-            BufferedImage img = ImageIO.read(inStr);
+            BufferedImage img = ImageIO.read((InputStream) inStr);
             imageNames.add(entry.getName());
             images.put(entry.getName(), img);
         }
         // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
         f.close();
         Collections.sort(imageNames);
+        int asd = 2;
     }
 
     /**
@@ -71,14 +72,16 @@ public class FramesManager {
      *
      * */
     public void saveImagesToZip(String fname, ArrayList<Byte> data) throws IOException{
-
-        FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
+        if(fname == null){
+            fname = "out";
+        }
+        FileOutputStream fileOS = new FileOutputStream(fname + ".zip");
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
         // Para cada imagen, creamos un fichero jpeg temporal,
         // el cual se añadirá al archivo zip mediante la función createFileToZip
         // Finalmente, este fichero se elimina
         for (int i =0; i< imageNames.size(); i++) {
-            String pathName = "img_" + Integer.toString(i) + ".jpg";
+            String pathName = "img_" + i + ".jpg";
             File tempImage = new File(pathName);
             ImageIO.write(images.get(imageNames.get(i)),"jpg",tempImage);
             createFileToZip(pathName, zipOS);

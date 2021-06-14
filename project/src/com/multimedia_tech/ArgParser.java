@@ -93,8 +93,6 @@ public class ArgParser {
     }
 
     public String getOutputPath() {
-        if(outputName == null)
-            return "out";
         return outputName;
     }
 

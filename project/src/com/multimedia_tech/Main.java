@@ -50,10 +50,7 @@ public class Main {
                 fv.run();
             }
 
-            if(parser.getEncodeOption()){{
-                if (parser.getOutputPath() == null)
-                    System.err.println("Add output file");
-                }
+            if(parser.getEncodeOption()){
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Byte> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
                 fm.saveImagesToZip(parser.getOutputPath(), ret);

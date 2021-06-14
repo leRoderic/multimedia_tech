@@ -277,7 +277,7 @@ public class FramesObject {
                     for (int m = 0; m < matchCoordinates.size(); m++) {
                         x = matchCoordinates.get(m)[0];
                         y = matchCoordinates.get(m)[1];
-                        int[] colors = frames.get(i).getRGB(x, y, xTiles, yTiles, null, 0, xTiles*yTiles);
+                        int[] colors = frames.get(i).getRGB(x, y, xTiles, yTiles, null, 0, xTiles);
                         int r = 0, g = 0, b = 0;
                         for (int c : colors) {
                             r += ((c >> 16) & 0xFF);
