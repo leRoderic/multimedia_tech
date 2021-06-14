@@ -70,7 +70,7 @@ public class FramesManager {
      * @param fname -> Nombre del archivo de salida
      *
      * */
-    public void saveImagesToZip(String fname) throws IOException{
+    public void saveImagesToZip(String fname, ArrayList<Byte> data) throws IOException{
 
         FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
         ZipOutputStream zipOS = new ZipOutputStream(fileOS);
@@ -84,6 +84,16 @@ public class FramesManager {
             createFileToZip(pathName, zipOS);
             tempImage.delete();
         }
+
+        byte d[] = new byte[data.size()];
+        for(int i = 0; i<data.size(); i++){
+          d[i]=data.get(i);
+        }
+        ZipEntry f = new ZipEntry("aor.data");
+        zipOS.putNextEntry(f);
+        zipOS.write(d, 0, d.length);
+        zipOS.closeEntry();
+
         // Cerramos OutputsStreams
         zipOS.finish();
         zipOS.close();

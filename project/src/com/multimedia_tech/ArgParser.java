@@ -4,6 +4,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ArgParser {
@@ -132,11 +133,17 @@ public class ArgParser {
     }
 
     public List<Integer> getTesselationValues() {
-        String asd = nTiles;
+        if(nTiles == null){
+            return new ArrayList(Arrays.asList(10, 10));
+        }
         String [] vals = nTiles.split(",");
         List<Integer> list = new ArrayList<>();
         for(String i: vals){
             list.add(Integer.parseInt(i));
+        }
+        if(list.size() != 2){
+            System.out.println("Error> Missing values, check help and try again");
+            System.exit(-1);
         }
         return list;
     }

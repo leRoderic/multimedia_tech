@@ -5,6 +5,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -22,6 +23,7 @@ public class Main {
             if (parser.help) {
                 jComm.usage();
             }
+            List<Integer> asd = parser.getTesselationValues();
             fm.loadZipImages(parser.getInputZip());
             FramesObject fo = fm.getOrderedFrames();
             if(parser.getFPS() != 0){
@@ -48,9 +50,18 @@ public class Main {
                 fv.run();
             }
 
-            if(parser.getOutputPath() != null){
-                fm.saveImagesToZip(parser.getOutputPath());
+            if(parser.getEncodeOption()){{
+                if (parser.getOutputPath() != null)
+                    System.err.println("Add output file");
+                }
+                List<Integer> dTiles = parser.getTesselationValues();
+                ArrayList<Byte> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
+                fm.saveImagesToZip(parser.getOutputPath(), ret);
             }
+
+            /* if(parser.getOutputPath() != null){
+                fm.saveImagesToZip(parser.getOutputPath());
+            }*/
         }catch (ParameterException | IOException pex){
             System.err.println(pex.getMessage());
             System.err.println("Try --help or -h for help.");
