@@ -64,8 +64,5 @@ public class Main {
             System.err.println(pex.getMessage());
             System.err.println("Try --help or -h for help.");
         }
-
     }
-
-
 }
