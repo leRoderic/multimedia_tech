@@ -41,14 +41,13 @@ public class FramesManager {
         while(entries.hasMoreElements()){
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
-            BufferedImage img = ImageIO.read((InputStream) inStr);
+            BufferedImage img = ImageIO.read(inStr);
             imageNames.add(entry.getName());
             images.put(entry.getName(), img);
         }
         // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
         f.close();
         Collections.sort(imageNames);
-        int asd = 2;
     }
 
     /**
@@ -83,8 +82,8 @@ public class FramesManager {
         for (int i =0; i< imageNames.size(); i++) {
             String pathName = "img_" + i + ".jpg";
             File tempImage = new File(pathName);
-            ImageIO.write(images.get(imageNames.get(i)),"jpg",tempImage);
-            createFileToZip(pathName, zipOS);
+            ImageIO.write(images.get(imageNames.get(i)),"jpg", tempImage);
+            createFileToZip(images.get(imageNames.get(i)), pathName, zipOS);
             tempImage.delete();
         }
 
@@ -110,10 +109,10 @@ public class FramesManager {
         // el cual se añadirá al archivo zip mediante la función createFileToZip
         // Finalmente, este fichero se elimina
         for (int i =0; i< imageNames.size(); i++) {
-            String pathName = "img_" + Integer.toString(i) + ".jpg";
+            String pathName = "img_" + i + ".jpg";
             File tempImage = new File(pathName);
-            ImageIO.write(images.get(imageNames.get(i)),"jpg",tempImage);
-            createFileToZip(pathName, zipOS);
+            ImageIO.write(images.get(imageNames.get(i)),"jpg", tempImage);
+            createFileToZip(images.get(imageNames.get(i)), pathName, zipOS);
             tempImage.delete();
         }
 
@@ -129,7 +128,7 @@ public class FramesManager {
      * @param zipOS -> Archivo ZIP de salida
      *
      * */
-    private void createFileToZip(String fileName, ZipOutputStream zipOS) throws FileNotFoundException, IOException {
+    private void createFileToZip(BufferedImage i, String fileName, ZipOutputStream zipOS) throws FileNotFoundException, IOException {
         // Creamos la imagen y el input stream
         File f = new File(fileName);
         FileInputStream fis = new FileInputStream(f);
@@ -137,11 +136,7 @@ public class FramesManager {
         ZipEntry zipEntry = new ZipEntry(fileName);
         //Guardamos la imagen como un array de bytes
         zipOS.putNextEntry(zipEntry);
-        byte[] bytes = new byte[1024];
-        int length;
-        while ((length = fis.read(bytes)) >= 0) {
-            zipOS.write(bytes, 0, length);
-        }
+        ImageIO.write(i, "jpg", zipOS);
         // Cerramos entrada ZIP de la imagen y OutputsStream
         zipOS.closeEntry();
         fis.close();
