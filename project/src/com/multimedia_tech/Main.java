@@ -53,6 +53,7 @@ public class Main {
             if(parser.getEncodeOption()){
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Byte> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
+                fo.applyMeanFilter(parser.getAVGFilterValue());
                 fm.saveImagesToZip(parser.getOutputPath(), ret);
             }else{
                 if(parser.getOutputPath() != null){
