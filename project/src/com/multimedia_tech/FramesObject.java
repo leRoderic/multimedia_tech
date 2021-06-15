@@ -254,6 +254,7 @@ public class FramesObject {
         BufferedImage[] reference = null;
 
         for (int i = 0; i < frames.size(); i++) {
+            coincidence = 0;
             if (frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0) {
                 System.out.println("Error> Specified tesselation parameters bigger than image");
                 System.exit(-1);
@@ -265,8 +266,43 @@ public class FramesObject {
                 // Código imagénes intercuadro
                 matchCoordinates = new ArrayList<>();
                 data.add(i);
-                coincidence = 0;
+                data.add(0);
+                int index = data.size() - 1;
+
                 for (int j = 0; j < reference.length; j++) {
+                    if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
+
+                        coincidence -= -1;
+                    }
+                }
+
+                if(coincidence > 0){
+                    data.set(index, coincidence);
+                    //System.out.println(coincidence);
+                    int x, y;
+                    for (int m = 0; m < matchCoordinates.size(); m++) {
+                        x = matchCoordinates.get(m)[0];
+                        y = matchCoordinates.get(m)[1];
+                        int[] colors = frames.get(i).getRGB(x, y, xTiles, yTiles, null, 0, xTiles);
+                        int r = 0, g = 0, b = 0;
+                        for (int c : colors) {
+                            r += ((c >> 16) & 0xFF);
+                            g += ((c >> 8) & 0xFF);
+                            b += (c & 0xFF);
+                        }
+                        int R = r / colors.length;
+                        int G = g / colors.length;
+                        int B = b / colors.length;
+
+                        int[] rgbArray = new int[(xTiles - 2) * (yTiles - 2)];
+                        Color c = new Color(R, G, B);
+
+                        Arrays.fill(rgbArray, c.getRGB());
+                        frames.get(i).setRGB(++x, ++y, xTiles - 2, yTiles - 2, rgbArray, 0, 0);
+                    }
+                }
+
+                /*for (int j = 0; j < reference.length; j++) {
                     if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
 
                         coincidence -= -1;
@@ -298,7 +334,7 @@ public class FramesObject {
                         Arrays.fill(rgbArray, c.getRGB());
                         frames.get(i).setRGB(++x, ++y, xTiles - 2, yTiles - 2, rgbArray, 0, 0);
                     }
-                }
+                }*/
             } else {
                 // Código imagénes intracuadro - referencia
                 reference = subdivideFrames(frames.get(i), xTiles, yTiles, rows, cols);
@@ -401,7 +437,7 @@ public class FramesObject {
             int nFrame = d.get(counter++);
             //System.out.println(nFrame);
             int coincidence = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-            System.out.println(coincidence);
+            //System.out.println(coincidence);
             int rows = frames.get(nFrame).getWidth() / xTiles;
             int cols = frames.get(nFrame).getHeight() / yTiles;
             //loop over matches

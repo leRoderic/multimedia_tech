@@ -55,15 +55,27 @@ public class FramesManager {
                     System.out.println(sc.next());
                 }
                 int asd =23;*/
-                byte[] buf = new byte[1024];
+
+                /*byte[] buf = new byte[1024];
                 int counter = inStr.read(buf);
                 while((counter != -1)){
                     for(int i=0; i < counter; i++){
                         inData.add((int)buf[i] & 0xff);
-                        System.out.println((int)buf[i] & 0xff);
+                        System.out.println(buf[i]);
+                    }
+                    counter = inStr.read(buf);
+                }*/
+                byte[] buf = new byte[4];
+                int counter = inStr.read(buf);
+                while((counter != -1)) {
+                    for (int i = 0; i < counter; i += 4) {
+                        int value = buf[i] & 0xff | buf[i + 1] << 8 | buf[i + 2] << 16 | buf[i + 3] << 24;
+                        inData.add(value);
+                        System.out.println(value);
                     }
                     counter = inStr.read(buf);
                 }
+
             } else {
                 BufferedImage img = ImageIO.read(inStr);
                 imageNames.add(entry.getName());
@@ -118,14 +130,21 @@ public class FramesManager {
         }
         zipOS.closeEntry();*/
 
-        byte d[] = new byte[data.size()];
-        for (int i = 0; i < data.size(); i++) {
-            d[i] = data.get(i).byteValue();
-            //System.out.println(data.get(i));
-        }
+
         ZipEntry f = new ZipEntry("aor.txt");
         zipOS.putNextEntry(f);
-        zipOS.write(d, 0, d.length);
+
+        for (int i = 0; i < data.size(); i++) {
+            //d[i] = data.get(i).byteValue();
+            byte d[] = new byte[4];
+            d[0] = (byte) (data.get(i) >> 0);
+            d[1] = (byte) (data.get(i) >> 8);
+            d[2] = (byte) (data.get(i) >> 16);
+            d[3] = (byte) (data.get(i) >> 24);
+            //System.out.println(data.get(i));
+            zipOS.write(d, 0, d.length);
+        }
+
         zipOS.closeEntry();
 
 
