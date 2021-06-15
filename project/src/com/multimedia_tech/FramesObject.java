@@ -2,6 +2,8 @@ package com.multimedia_tech;
 
 /*import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;*/
+import com.sun.media.imageioimpl.common.ImageUtil;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -242,6 +244,7 @@ public class FramesObject {
         ArrayList<Byte> data = new ArrayList();
         //ArrayList<int[]> matchesCoords = new ArrayList();
         // ESTRUCTURA      GOP  xTiles  yTiles  :: #frame
+        data.add((byte) (111 & 0xff));
         data.add((byte) (gop & 0xff));
         data.add((byte) (xTiles & 0xff));
         data.add((byte) (yTiles & 0xff));
@@ -390,69 +393,43 @@ public class FramesObject {
         return a1 * a2 * Math.sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
     }
 
-    /*public static ArrayList<BufferedImage> decode(File packed) {
-        System.out.println("@decode receives " + packed.getName());
-        try {
-            decompress(packed);
-        } catch (Exception ex) {
-            Logger.getLogger(Base64.Decoder.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        //printBuilder();
-        build();
-        return compressed;
-    }
+    public void decode(ArrayList<Byte> d, FramesViewer fv) {
 
-    private static File[] decompress(File encoded) throws Exception {
-        String tarFile = encoded.getName();
-        File[] output = new File[2];
+        int counter = 1;
+        byte gop = d.get(counter++);
+        byte xTiles = d.get(counter++);
+        byte yTiles = d.get(counter++);
 
-        // Create a TarInputStream
-        TarInputStream tis;
-        try {
-            tis = new TarInputStream(new BufferedInputStream(new FileInputStream(tarFile)));
-
-            TarEntry entry;
-            int id = 0;
-            while ((entry = tis.getNextEntry()) != null) {
-
-                byte data[] = new byte[BUFFER_SIZE];
-                FileOutputStream fos;
-                fos = new FileOutputStream(entry.getName());
-                BufferedOutputStream dest = new BufferedOutputStream(fos);
-
-                int count;
-                while ((count = tis.read(data)) != -1) {
-                    dest.write(data, 0, count);
+       while(counter < d.size()-1){
+            byte nFrame = d.get(counter++);
+            int coincidence =  ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+            int rows = frames.get(nFrame).getWidth() / xTiles;
+            int cols = frames.get(nFrame).getHeight() / yTiles;
+            //loop over matches
+            for(int i=0; i < coincidence -1; i++){
+                int y = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+                int x = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+                int nFrameC = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+                /**
+                 (0,0) (0,1) (0,2) (0,3) (0,4)
+                 0     1     2     3     4
+                 (1,0) (1,1) (1,2) (1,3) (1,4)
+                 5     6     7     8     9  */
+                BufferedImage frameI = frames.get((nFrame/gop)*gop).getSubimage((nFrameC%rows)*xTiles, (nFrameC%cols)*yTiles, xTiles, yTiles);
+                for(int fy=0; fy < frameI.getHeight(); fy++) {
+                    for (int fx = 0; fx < frameI.getWidth(); fx++) {
+                        int color = frameI.getRGB(fx, fy);
+                        try {
+                            frames.get(nFrame).setRGB(x * xTiles + fx, y * yTiles + fy, color);
+                        }catch (Exception e){
+                            int asd = 21;
+                        }
+                    }
                 }
-
-                dest.flush();
-                dest.close();
-
-                //Once extracted read as tmp files. We should delete them after processing.
-                System.out.print("\t File " + entry.getName() + " extracted");
-                File tmp = new File(entry.getName());
-                if (id == 0) {
-                    System.out.println("\t\t-> @readZip");
-                    compressed = ZipSaveWorker.readZip(tmp);
-                } else if (id == 1 && entry.getName().equals(Encoder.BUILDER_FNAME)) {
-                    System.out.println("\t-> @decompressGzipFile");
-                    builder = decompressGzipFile(entry.getName(), BUFFER_SIZE);
-                }
-                tmp.delete();
-                id++;
             }
-            tis.close();
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        } catch (IOException ex) {
-            Logger.getLogger(Decoder.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+           fv.addImage(frames.get(nFrame));
         }
-
-        return output;
-    }*/
-
-
+        d.clear();
+        System.out.println("@build -> Reconstruction DONE!");
+    }
 }

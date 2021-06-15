@@ -14,11 +14,21 @@ public class FramesViewer extends JFrame implements Runnable {
     public JLabel window;
     private String framesTitle;
 
-    public FramesViewer(FramesObject fo, int framesPerSecond){
-        images = fo.getFrames();
+    public FramesViewer(FramesObject fo, int framesPerSecond, boolean decode){
+        if(!decode){
+            images = fo.getFrames();
+        }else{
+            images = new ArrayList<>();
+        }
         framesTitle = fo.getName();
         fps = framesPerSecond;
         window = new JLabel();
+    }
+
+    public void addImage(BufferedImage b){
+        images.add(b);
+        if(images.size() == 1)
+            run();
     }
 
     /**

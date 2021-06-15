@@ -45,19 +45,21 @@ public class Main {
                 fo.applyEdgeDetectionFilter();
             }
 
-            if(!parser.getBatchOption()) {
-                FramesViewer fv = new FramesViewer(fo, fps);
-                fv.run();
-            }
-
             if(parser.getEncodeOption()){
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Byte> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
                 fo.applyMeanFilter(parser.getAVGFilterValue());
                 fm.saveImagesToZip(parser.getOutputPath(), ret);
             }else{
-                if(parser.getOutputPath() != null){
-                    fm.saveImagesToZip(parser.getOutputPath());
+                if(parser.getDecodeOption()){
+                    fo.decode(fm.getInData(), new FramesViewer(fo, fps, true));
+                }else {
+                    if(!parser.getBatchOption()) {
+                        new FramesViewer(fo, fps, false).run();
+                    }
+                    if (parser.getOutputPath() != null) {
+                        fm.saveImagesToZip(parser.getOutputPath());
+                    }
                 }
             }
         }catch (ParameterException | IOException pex){

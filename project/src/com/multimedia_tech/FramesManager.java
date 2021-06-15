@@ -14,15 +14,21 @@ public class FramesManager {
     private ArrayList<String> imageNames;
     private Map<String, BufferedImage> images;
     private String fName;
+    private ArrayList<Byte> inData;
 
     private FramesManager() {
         images = new HashMap<>();
         imageNames = new ArrayList<>();
         fName = "";
+        inData = new ArrayList<>();
     }
 
     public static FramesManager getInstance() {
         return mgr;
+    }
+
+    public ArrayList<Byte> getInData() {
+        return inData;
     }
 
     /**
@@ -40,12 +46,28 @@ public class FramesManager {
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
-            BufferedImage img = ImageIO.read(inStr);
-            imageNames.add(entry.getName());
-            images.put(entry.getName(), img);
-        }
-        // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
-        f.close();
+            if(entry.getName().contains(".data")){
+                byte[] buf = new byte[1024];
+                int counter = inStr.read(buf);
+                while((counter != -1)){
+                    for(int i=0; i < counter; i++){
+                        inData.add(buf[i]);
+                    }
+                    counter = inStr.read(buf);
+                }
+                int ads = inData.get(0).intValue();
+                if(inData.get(0) != (111 & 0xff)){
+                    System.err.println("Error> File metadata is corrupted :(");
+                    System.exit(-1);
+                }
+            } else {
+                BufferedImage img = ImageIO.read(inStr);
+                imageNames.add(entry.getName());
+                images.put(entry.getName(), img);
+            }
+            }
+            // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
+            f.close();
         Collections.sort(imageNames);
     }
 
