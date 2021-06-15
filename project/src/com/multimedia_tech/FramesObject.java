@@ -2,6 +2,7 @@ package com.multimedia_tech;
 
 /*import org.xeustechnologies.jtar.TarEntry;
 import org.xeustechnologies.jtar.TarInputStream;*/
+
 import com.sun.media.imageioimpl.common.ImageUtil;
 
 import java.io.BufferedInputStream;
@@ -244,7 +245,7 @@ public class FramesObject {
         ArrayList<Integer> data = new ArrayList();
         //ArrayList<int[]> matchesCoords = new ArrayList();
         // ESTRUCTURA      GOP  xTiles  yTiles  :: #frame
-        data.add(111);
+        //data.add(111);
         data.add(gop);
         data.add(xTiles);
         data.add(yTiles);
@@ -253,7 +254,7 @@ public class FramesObject {
         BufferedImage[] reference = null;
 
         for (int i = 0; i < frames.size(); i++) {
-            if(frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0){
+            if (frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0) {
                 System.out.println("Error> Specified tesselation parameters bigger than image");
                 System.exit(-1);
             }
@@ -390,39 +391,39 @@ public class FramesObject {
 
     public void decode(ArrayList<Integer> d, FramesViewer fv) {
 
-        int counter = 1;
+        int counter = 0;
         int gop = d.get(counter++);
         int xTiles = d.get(counter++);
         int yTiles = d.get(counter++);
 
-       while(counter < d.size()-1){
+        while (counter < d.size()) {
             int nFrame = d.get(counter++);
-            int coincidence =  ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+            int coincidence = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
             int rows = frames.get(nFrame).getWidth() / xTiles;
             int cols = frames.get(nFrame).getHeight() / yTiles;
             //loop over matches
-            for(int i=0; i < coincidence -1; i++){
-                int y = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
-                int x = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
-                int nFrameC = ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
+            for (int i = 0; i < coincidence; i++) {
+                int y = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                int x = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                int nFrameC = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
                 /**
                  (0,0) (0,1) (0,2) (0,3) (0,4)
                  0     1     2     3     4
                  (1,0) (1,1) (1,2) (1,3) (1,4)
                  5     6     7     8     9  */
-                BufferedImage frameI = frames.get((nFrame/gop)*gop).getSubimage((nFrameC%rows)*xTiles, (nFrameC%cols)*yTiles, xTiles, yTiles);
-                for(int fy=0; fy < frameI.getHeight(); fy++) {
+                BufferedImage frameI = frames.get((nFrame / gop) * gop).getSubimage((nFrameC % rows) * xTiles, (nFrameC % cols) * yTiles, xTiles, yTiles);
+                for (int fy = 0; fy < frameI.getHeight(); fy++) {
                     for (int fx = 0; fx < frameI.getWidth(); fx++) {
                         int color = frameI.getRGB(fx, fy);
                         try {
                             frames.get(nFrame).setRGB(x * xTiles + fx, y * yTiles + fy, color);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             int asd = 21;
                         }
                     }
                 }
             }
-           fv.addImage(frames.get(nFrame));
+            fv.addImage(frames.get(nFrame));
         }
         d.clear();
         System.out.println("@build -> Reconstruction DONE!");

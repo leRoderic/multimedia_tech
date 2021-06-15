@@ -48,11 +48,20 @@ public class FramesManager {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
             if (entry.getName().contains(".txt")) {
+                /*System.out.println(entry.getName());
                 Scanner sc = new Scanner(inStr);
-                while(sc.hasNextInt()){
-                    inData.add(sc.nextInt());
+                while(sc.hasNext()){
+                    System.out.println(sc.next());
                 }
-                int asd =23;
+                int asd =23;*/
+                byte[] buf = new byte[1024];
+                int counter = inStr.read(buf);
+                while((counter != -1)){
+                    for(int i=0; i < counter; i++){
+                        inData.add((int)buf[i]);
+                    }
+                    counter = inStr.read(buf);
+                }
             } else {
                 BufferedImage img = ImageIO.read(inStr);
                 imageNames.add(entry.getName());
@@ -100,12 +109,22 @@ public class FramesManager {
         }
 
 
-        ZipEntry f = new ZipEntry("aor.txt");
+        /*ZipEntry f = new ZipEntry("aor.txt");
         zipOS.putNextEntry(f);
         for (int i = 0; i < data.size(); i++) {
-            zipOS.write(data.get(i));
+            zipOS.write((int)data.get(i));
         }
+        zipOS.closeEntry();*/
+
+        byte d[] = new byte[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            d[i] = data.get(i).byteValue();
+        }
+        ZipEntry f = new ZipEntry("aor.txt");
+        zipOS.putNextEntry(f);
+        zipOS.write(d, 0, d.length);
         zipOS.closeEntry();
+
 
         // Cerramos OutputsStreams
         zipOS.finish();
