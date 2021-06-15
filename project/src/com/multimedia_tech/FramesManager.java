@@ -1,6 +1,7 @@
 package com.multimedia_tech;
 
 import javax.imageio.ImageIO;
+import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -58,7 +59,8 @@ public class FramesManager {
                 int counter = inStr.read(buf);
                 while((counter != -1)){
                     for(int i=0; i < counter; i++){
-                        inData.add((int)buf[i]);
+                        inData.add((int)buf[i] & 0xff);
+                        System.out.println((int)buf[i] & 0xff);
                     }
                     counter = inStr.read(buf);
                 }
@@ -119,6 +121,7 @@ public class FramesManager {
         byte d[] = new byte[data.size()];
         for (int i = 0; i < data.size(); i++) {
             d[i] = data.get(i).byteValue();
+            //System.out.println(data.get(i));
         }
         ZipEntry f = new ZipEntry("aor.txt");
         zipOS.putNextEntry(f);

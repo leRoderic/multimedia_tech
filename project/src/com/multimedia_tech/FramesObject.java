@@ -265,6 +265,7 @@ public class FramesObject {
                 // Código imagénes intercuadro
                 matchCoordinates = new ArrayList<>();
                 data.add(i);
+                coincidence = 0;
                 for (int j = 0; j < reference.length; j++) {
                     if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
 
@@ -275,6 +276,7 @@ public class FramesObject {
                     data.add(0);
                 } else {
                     data.add(coincidence);
+                    //System.out.println(coincidence);
                     int x, y;
                     for (int m = 0; m < matchCoordinates.size(); m++) {
                         x = matchCoordinates.get(m)[0];
@@ -297,7 +299,6 @@ public class FramesObject {
                         frames.get(i).setRGB(++x, ++y, xTiles - 2, yTiles - 2, rgbArray, 0, 0);
                     }
                 }
-
             } else {
                 // Código imagénes intracuadro - referencia
                 reference = subdivideFrames(frames.get(i), xTiles, yTiles, rows, cols);
@@ -398,14 +399,16 @@ public class FramesObject {
 
         while (counter < d.size()) {
             int nFrame = d.get(counter++);
-            int coincidence = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+            //System.out.println(nFrame);
+            int coincidence = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+            System.out.println(coincidence);
             int rows = frames.get(nFrame).getWidth() / xTiles;
             int cols = frames.get(nFrame).getHeight() / yTiles;
             //loop over matches
             for (int i = 0; i < coincidence; i++) {
-                int y = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-                int x = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-                int nFrameC = ((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                int y = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                int x = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                int nFrameC = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
                 /**
                  (0,0) (0,1) (0,2) (0,3) (0,4)
                  0     1     2     3     4
