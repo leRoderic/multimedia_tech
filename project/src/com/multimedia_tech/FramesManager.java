@@ -3,6 +3,7 @@ package com.multimedia_tech;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -14,7 +15,7 @@ public class FramesManager {
     private ArrayList<String> imageNames;
     private Map<String, BufferedImage> images;
     private String fName;
-    private ArrayList<Byte> inData;
+    private ArrayList<Integer> inData;
 
     private FramesManager() {
         images = new HashMap<>();
@@ -27,7 +28,7 @@ public class FramesManager {
         return mgr;
     }
 
-    public ArrayList<Byte> getInData() {
+    public ArrayList<Integer> getInData() {
         return inData;
     }
 
@@ -46,28 +47,20 @@ public class FramesManager {
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
-            if(entry.getName().contains(".data")){
-                byte[] buf = new byte[1024];
-                int counter = inStr.read(buf);
-                while((counter != -1)){
-                    for(int i=0; i < counter; i++){
-                        inData.add(buf[i]);
-                    }
-                    counter = inStr.read(buf);
+            if (entry.getName().contains(".txt")) {
+                Scanner sc = new Scanner(inStr);
+                while(sc.hasNextInt()){
+                    inData.add(sc.nextInt());
                 }
-                int ads = inData.get(0).intValue();
-                if(inData.get(0) != (111 & 0xff)){
-                    System.err.println("Error> File metadata is corrupted :(");
-                    System.exit(-1);
-                }
+                int asd =23;
             } else {
                 BufferedImage img = ImageIO.read(inStr);
                 imageNames.add(entry.getName());
                 images.put(entry.getName(), img);
             }
-            }
-            // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
-            f.close();
+        }
+        // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
+        f.close();
         Collections.sort(imageNames);
     }
 
@@ -89,7 +82,7 @@ public class FramesManager {
      *
      * @param fname -> Nombre del archivo de salida
      */
-    public void saveImagesToZip(String fname, ArrayList<Byte> data) throws IOException {
+    public void saveImagesToZip(String fname, ArrayList<Integer> data) throws IOException {
         if (fname == null) {
             fname = "out";
         }
@@ -106,13 +99,12 @@ public class FramesManager {
             tempImage.delete();
         }
 
-        byte d[] = new byte[data.size()];
-        for (int i = 0; i < data.size(); i++) {
-            d[i] = data.get(i);
-        }
-        ZipEntry f = new ZipEntry("aor.data");
+
+        ZipEntry f = new ZipEntry("aor.txt");
         zipOS.putNextEntry(f);
-        zipOS.write(d, 0, d.length);
+        for (int i = 0; i < data.size(); i++) {
+            zipOS.write(data.get(i));
+        }
         zipOS.closeEntry();
 
         // Cerramos OutputsStreams

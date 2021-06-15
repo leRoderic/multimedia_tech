@@ -239,15 +239,15 @@ public class FramesObject {
         return gray;
     }
 
-    public ArrayList<Byte> encode(int gop, int seekRange, int quality, int xTiles, int yTiles) {
+    public ArrayList<Integer> encode(int gop, int seekRange, int quality, int xTiles, int yTiles) {
         ArrayList<int[]> matchCoordinates;
-        ArrayList<Byte> data = new ArrayList();
+        ArrayList<Integer> data = new ArrayList();
         //ArrayList<int[]> matchesCoords = new ArrayList();
         // ESTRUCTURA      GOP  xTiles  yTiles  :: #frame
-        data.add((byte) (111 & 0xff));
-        data.add((byte) (gop & 0xff));
-        data.add((byte) (xTiles & 0xff));
-        data.add((byte) (yTiles & 0xff));
+        data.add(111);
+        data.add(gop);
+        data.add(xTiles);
+        data.add(yTiles);
         int coincidence = 0;
 
         BufferedImage[] reference = null;
@@ -263,7 +263,7 @@ public class FramesObject {
             if (i % gop != 0) {
                 // Código imagénes intercuadro
                 matchCoordinates = new ArrayList<>();
-                data.add((byte) (i & 0xff));
+                data.add(i);
                 for (int j = 0; j < reference.length; j++) {
                     if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
 
@@ -271,11 +271,9 @@ public class FramesObject {
                     }
                 }
                 if (coincidence <= 0) {
-                    data.add((byte) (0));
-                    data.add((byte) (0));
+                    data.add(0);
                 } else {
-                    data.add((byte) (coincidence & 0xff));
-                    data.add((byte) ((coincidence >> 8) & 0xff));
+                    data.add(coincidence);
                     int x, y;
                     for (int m = 0; m < matchCoordinates.size(); m++) {
                         x = matchCoordinates.get(m)[0];
@@ -324,7 +322,7 @@ public class FramesObject {
     }
 
     private boolean findCoincidence(int nFrame, BufferedImage frame, BufferedImage reference, int xTiles,
-                                    int yTiles, int quality, int rows, int cols, int seekRange, ArrayList<Byte> d,
+                                    int yTiles, int quality, int rows, int cols, int seekRange, ArrayList<Integer> d,
                                     ArrayList<int[]> c) {
 
 
@@ -355,12 +353,9 @@ public class FramesObject {
                 double correlation = compareImages(frame.getSubimage(y, x, xTiles, yTiles), reference);
                 if (correlation < quality) {
                     c.add(new int[]{y, x});
-                    d.add((byte) (y & 0xff));
-                    d.add((byte) ((y >> 8) & 0xff));
-                    d.add((byte) (x & 0xff));
-                    d.add((byte) ((x >> 8) & 0xff));
-                    d.add((byte) (nFrame & 0xff));
-                    d.add((byte) ((nFrame >> 8) & 0xff));
+                    d.add(y);
+                    d.add(x);
+                    d.add(nFrame);
                     return true;
                 }
             }
@@ -393,15 +388,15 @@ public class FramesObject {
         return a1 * a2 * Math.sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
     }
 
-    public void decode(ArrayList<Byte> d, FramesViewer fv) {
+    public void decode(ArrayList<Integer> d, FramesViewer fv) {
 
         int counter = 1;
-        byte gop = d.get(counter++);
-        byte xTiles = d.get(counter++);
-        byte yTiles = d.get(counter++);
+        int gop = d.get(counter++);
+        int xTiles = d.get(counter++);
+        int yTiles = d.get(counter++);
 
        while(counter < d.size()-1){
-            byte nFrame = d.get(counter++);
+            int nFrame = d.get(counter++);
             int coincidence =  ((d.get(counter++) & 0xff) |  ((d.get(counter++) & 0xff) << 8 ) );
             int rows = frames.get(nFrame).getWidth() / xTiles;
             int cols = frames.get(nFrame).getHeight() / yTiles;
