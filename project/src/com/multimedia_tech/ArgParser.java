@@ -1,8 +1,6 @@
 package com.multimedia_tech;
 
-import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.Parameter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -88,50 +86,110 @@ public class ArgParser {
             description = "Lists all options available", help = true)
     public boolean help;
 
+    /**
+     * Devuelve el nombre del fichero a cargar proporcionado por consola.
+     *
+     * @return el nombre del fichero
+     */
     public String getInputZip() {
         return inputZip;
     }
 
+    /**
+     * Devuelve el nombre del directorio de salida proporcionado por consola.
+     *
+     * @return
+     */
     public String getOutputPath() {
         return outputName;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de encode.
+     *
+     * @return true: si  false: no
+     */
     public boolean getEncodeOption() {
         return encode;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de decode.
+     *
+     * @return true: si  false: no
+     */
     public boolean getDecodeOption() {
         return decode;
     }
 
+    /**
+     * Devuelve el valor FPS introducido por consola
+     *
+     * @return el valor FPS
+     */
     public int getFPS() {
         return fps;
     }
 
+    /**
+     * Devuelve el valor umbral para aplicar el filtro de binarización.
+     *
+     * @return valor umbral
+     */
     public int getBinarizationFilter() {
         return binFilter;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de batch.
+     *
+     * @return true: si  false: no
+     */
     public boolean getBatchOption() {
         return batch;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de aplicar filtro negativo.
+     *
+     * @return  true: si  false: no
+     */
     public boolean getNegativeOption() {
         return negative;
     }
 
+    /**
+     * Devuelve el valor proporcionado para aplicar el filtro average.
+     *
+     * @return el valor
+     */
     public int getAVGFilterValue() {
         return avg;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de aplicar filtro escala de grises.
+     *
+     * @return true: si  false: no
+     */
     public boolean getGrayScaleOption() {
         return grayScale;
     }
 
+    /**
+     * Devuelve si se ha seleccionado la opción de aplicar el detector de contornos.
+     *
+     * @return  true: si  false: no
+     */
     public boolean getEdgeDetectionOption() {
         return edge;
     }
 
+    /**
+     * Devuelve los valores proporcionados para el tamaño de las teselas.
+     *
+     * @return lista con los valores de las teselas
+     */
     public List<Integer> getTesselationValues() {
         if(nTiles == null){
             return new ArrayList(Arrays.asList(10, 10));
@@ -148,18 +206,33 @@ public class ArgParser {
         return list;
     }
 
+    /**
+     * Devuelve el valor proporcionado para la búsqueda.
+     *
+     * @return el valor de búsqueda
+     */
     public int getSeekRange() {
         if(gop == 0)
             return 4;
         return seekRange;
     }
 
+    /**
+     * Devuelve el GOP proporcionado.
+     *
+     * @return el valor GOP
+     */
     public int getGOP() {
         if(gop == 0)
             return 5;
         return gop;
     }
 
+    /**
+     * Devuelve el factor de calidad proporcionado.
+     *
+     * @return el valor de calidad
+     */
     public int getQuality() {
         if(gop == 0)
             return 5;

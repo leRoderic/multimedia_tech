@@ -23,7 +23,7 @@ public class Main {
             if (parser.help) {
                 jComm.usage();
             }
-            fm.loadZipImages(parser.getInputZip());
+            long originalSize = fm.loadZipImages(parser.getInputZip()), compressedSize = 0;
             FramesObject fo = fm.getOrderedFrames();
             if(parser.getFPS() != 0){
                 fps = parser.getFPS();
@@ -48,7 +48,8 @@ public class Main {
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Integer> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
                 fo.applyMeanFilter(5);
-                fm.saveImagesToZip(parser.getOutputPath(), ret);
+                compressedSize = fm.saveImagesToZip(parser.getOutputPath(), ret);
+                System.out.print("AOR> Achieved compression ratio is " + (originalSize/compressedSize) +":1");
             }else{
                 if(parser.getDecodeOption()){
                     FramesViewer fv;

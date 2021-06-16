@@ -33,7 +33,7 @@ public class PSNR {
      * @param im2 Image 2.
      * @return Returns the PSNR.
      */
-    public static String calculate_PSNR(BufferedImage im1, BufferedImage im2) {
+    public static double calculate_PSNR(BufferedImage im1, BufferedImage im2) {
         assert(
                 im1.getType() == im2.getType()
                         && im1.getHeight() == im2.getHeight()
@@ -50,7 +50,7 @@ public class PSNR {
 
         mse /= (double) (width * height);
         double psnr = 10.0 * logbase10(Math.pow(255, 2) / mse);
-        System.err.println("PSNR = " + psnr);
-        return String.format("%.4f", psnr );
+        //System.err.println("PSNR = " + psnr);
+        return psnr;
     }
 }

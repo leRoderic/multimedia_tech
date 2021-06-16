@@ -16,7 +16,16 @@ public class FramesViewer extends JFrame implements Runnable {
     private boolean decode;
     private int decodeDelay;
 
+    /**
+     * Constructor del reproductor
+     *
+     * @param fo -> Objeto de tipo FramesObject
+     * @param framesPerSecond -> fps a reproducir las imágenes
+     * @param d -> Indica si se esta haciendo la decodificacion o no
+     */
     public FramesViewer(FramesObject fo, int framesPerSecond, boolean d){
+        // En el caso del decode, los frames no vienen directamente del fichero, por lo que el array se inicializa
+        // vacío.
         if(!d){
             images = fo.getFrames();
         }else{
@@ -68,12 +77,14 @@ public class FramesViewer extends JFrame implements Runnable {
         while (index < images.size()) {
             window.setIcon(new ImageIcon(images.get(index)));
             if(!decode) {
+                // Si se trata de la visualización normal, sin el decode. Se aplica el delay de los FPS tal cual.
                 try {
                     TimeUnit.MILLISECONDS.sleep(1000 / fps);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }else{
+                // Si se trata del decode, se compensa con el tiempo que ha tardado el codec en procesar el frame.
                 try {
                     Thread.sleep((1000 / fps) + decodeDelay);
                 } catch (InterruptedException e) {

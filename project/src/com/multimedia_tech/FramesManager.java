@@ -1,10 +1,8 @@
 package com.multimedia_tech;
 
 import javax.imageio.ImageIO;
-import javax.swing.plaf.synth.SynthTextAreaUI;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -18,6 +16,10 @@ public class FramesManager {
     private String fName;
     private ArrayList<Integer> inData;
 
+    /**
+     * Constructor privado porque se aplica el patrón Singleton. El objetivo es que exista una única instancia de
+     * esta clase.
+     */
     private FramesManager() {
         images = new HashMap<>();
         imageNames = new ArrayList<>();
@@ -25,10 +27,20 @@ public class FramesManager {
         inData = new ArrayList<>();
     }
 
+    /**
+     * Devuelve la única instancia de la clase.
+     *
+     * @return instancia clase FramesManager
+     */
     public static FramesManager getInstance() {
         return mgr;
     }
 
+    /**
+     * Devuelve los datos para la descompresión, provinientes del fichero interno añadido duranta la compresión.
+     *
+     * @return  array con los datos
+     */
     public ArrayList<Integer> getInData() {
         return inData;
     }
@@ -38,22 +50,27 @@ public class FramesManager {
      *
      * @param inputZip -> Nombre del archivo ZIP
      */
-    public void loadZipImages(String inputZip) throws IOException {
+    public long loadZipImages(String inputZip) throws IOException {
 
-        // Cargamos el ZIP i sus respectivas entradas/imágenes
+        // Cargamos el ZIP y sus respectivas entradas/imágenes
         ZipFile f = new ZipFile(new File(inputZip));
         fName = f.getName();
+        System.out.println("AOR> Loading frames...");
         Enumeration<? extends ZipEntry> entries = f.entries();
         // Recorremos cada una de las imágenes de entrada y las cargamos en un HashMap junto con su nombre
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
+            // Si el fichero termina en .data, se trata del fichero interno usado por el codec para guardar las
+            // teselas concidentes. Se procesa por separado.
             if (entry.getName().contains(".data")) {
-                // Leemos el fichero de datos mediante arrays de 4 bytes para cada int
+                System.out.println("AOR> Found .data file. Parsing values....");
+                // Los datos, en la compresión, se serializan como enteros de 4 bytes.
                 byte[] buf = new byte[4];
                 int counter = inStr.read(buf);
                 while((counter != -1)) {
                     for (int i = 0; i < counter; i += 4) {
+                        // Cada entero se lee como 4 bytes.
                         int value = buf[i] & 0xff | buf[i + 1] << 8 | buf[i + 2] << 16 | buf[i + 3] << 24;
                         inData.add(value);
                     }
@@ -61,15 +78,17 @@ public class FramesManager {
                 }
 
             } else {
-                // Leemos las imagenes
+                // Cada frame se lee en esta sección.
                 BufferedImage img = ImageIO.read(inStr);
                 imageNames.add(entry.getName());
                 images.put(entry.getName(), img);
             }
         }
-        // Cerramos el ZIP y ordenamos la lista de nombres de la imágenes
+        // Cerramos el ZIP y ordenamos la lista de nombres de las imágenes
         f.close();
         Collections.sort(imageNames);
+        System.out.println("AOR> File loading complete");
+        return new File(inputZip).length();
     }
 
     /**
@@ -86,11 +105,12 @@ public class FramesManager {
     }
 
     /**
-     * Función para guardar imagenes en un archivo ZIP
+     * Función para guardar imagenes en un archivo ZIP, tras su compresión
      *
      * @param fname -> Nombre del archivo de salida
      */
-    public void saveImagesToZip(String fname, ArrayList<Integer> data) throws IOException {
+    public long saveImagesToZip(String fname, ArrayList<Integer> data) throws IOException {
+        // Por defecto, si no se indica lo contrario, se establece el nombre del fichero de salida como out
         if (fname == null) {
             fname = "out";
         }
@@ -107,27 +127,34 @@ public class FramesManager {
             tempImage.delete();
         }
 
+        // Creamos una nueva entrada para el fichero que almacenara los datos
         ZipEntry f = new ZipEntry("aor.data");
         zipOS.putNextEntry(f);
-
-        for (int i = 0; i < data.si
+        // Guardamos cada int en un array de 4 bytes
+        for (int i = 0; i < data.size(); i++) {
             byte d[] = new byte[4];
             d[0] = (byte) (data.get(i) >> 0);
             d[1] = (byte) (data.get(i) >> 8);
             d[2] = (byte) (data.get(i) >> 16);
             d[3] = (byte) (data.get(i) >> 24);
-            //System.out.println(data.get(i));
             zipOS.write(d, 0, d.length);
         }
-
+        // Cerramos la entrada
         zipOS.closeEntry();
-
 
         // Cerramos OutputsStreams
         zipOS.finish();
         zipOS.close();
+        System.out.println("AOR> Frames saved in " + fname + ".aor file");
+        // Devolvemos el tamaño final para poder calcular la compresión
+        return new File(fname + ".aor").length();
     }
 
+    /**
+     * Función para guardar imagenes en un archivo ZIP, sin compresión previa.
+     *
+     * @param fname -> Nombre del archivo de salida
+     */
     public void saveImagesToZip(String fname) throws IOException {
 
         FileOutputStream fileOS = new FileOutputStream(fname + ".aor");
@@ -142,7 +169,7 @@ public class FramesManager {
             createFileToZip(images.get(imageNames.get(i)), pathName, zipOS);
             tempImage.delete();
         }
-
+        System.out.println("AOR> Frames saved in " + fname + ".aor file");
         // Cerramos OutputsStreams
         zipOS.finish();
         zipOS.close();

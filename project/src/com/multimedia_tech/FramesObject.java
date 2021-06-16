@@ -1,16 +1,5 @@
 package com.multimedia_tech;
 
-/*import org.xeustechnologies.jtar.TarEntry;
-import org.xeustechnologies.jtar.TarInputStream;*/
-
-import com.sun.media.imageioimpl.common.ImageUtil;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -225,6 +214,7 @@ public class FramesObject {
     /**
      * Función soporte para aplicar grayscale a un píxel
      *
+     * @param rgb -> Valor del color RGB
      * @return int grayscale
      */
     public static int getGrayScale(int rgb) {
@@ -237,21 +227,33 @@ public class FramesObject {
         return gray;
     }
 
+    /**
+     * Función para aplicar la codificación de la imágenes
+     *
+     * @param gop -> Numero de imágenes entre dos frames
+     * @param seekRange -> Desplazamiento maximo en la busqueda de teselas coincidentes
+     * @param quality -> Factor de calidad que determina cuando dos teselas son coincidentes
+     * @param xTiles -> Numero de teselas en la que dividir la imagen en el eje x
+     * @param yTiles -> Numero de teselas en la que dividir la imagen en el eje y
+     * @return ArrayList</Integers> data
+     */
     public ArrayList<Integer> encode(int gop, int seekRange, int quality, int xTiles, int yTiles) {
         ArrayList<int[]> matchCoordinates;
         ArrayList<Integer> data = new ArrayList();
-        //ArrayList<int[]> matchesCoords = new ArrayList();
-        // ESTRUCTURA      GOP  xTiles  yTiles  :: #frame
+        // ESTRUCTURA-> GOP xTile yTiles #Frame #Concidences:[x y #Frame, x y #Frame..] #Concidences:[x y #Frame, x y #Frame..] ..
         //data.add(111);
+        // Guardamos gop, xTiles, yTiles
         data.add(gop);
         data.add(xTiles);
         data.add(yTiles);
         int coincidence = 0;
 
         BufferedImage[] reference = null;
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
+        // Recorremos todos los frames
         for (int i = 0; i < frames.size(); i++) {
             coincidence = 0;
+            // En caso de especificar un numero de tesela no multiplo a los pixeles de la imágen, paramos
             if (frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0) {
                 System.out.println("Error> Specified tesselation parameters bigger than image");
                 System.exit(-1);
@@ -259,13 +261,15 @@ public class FramesObject {
             int rows = frames.get(i).getWidth() / xTiles;
             int cols = frames.get(i).getHeight() / yTiles;
 
+            // Imégenes intercuadro
             if (i % gop != 0) {
-                // Código imagénes intercuadro
                 matchCoordinates = new ArrayList<>();
+                //Guardamos el id del frame y un 0 de referencia
                 data.add(i);
                 data.add(0);
                 int index = data.size() - 1;
 
+                // Buscamos coinicdencias entre los frames
                 for (int j = 0; j < reference.length; j++) {
                     if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
 
@@ -273,9 +277,10 @@ public class FramesObject {
                     }
                 }
 
+                // Si se han encontrada coinidencias, modificamos el valor 0 añadido anteriormente
                 if(coincidence > 0){
                     data.set(index, coincidence);
-                    //System.out.println(coincidence);
+                    // Aplicamos el filtro medio para evitar cambios de color bruscos
                     int x, y;
                     for (int m = 0; m < matchCoordinates.size(); m++) {
                         x = matchCoordinates.get(m)[0];
@@ -298,55 +303,32 @@ public class FramesObject {
                         frames.get(i).setRGB(++x, ++y, xTiles - 2, yTiles - 2, rgbArray, 0, 0);
                     }
                 }
-
-                /*for (int j = 0; j < reference.length; j++) {
-                    if (findCoincidence(i, frames.get(i), reference[j], xTiles, yTiles, quality, rows, cols, seekRange, data, matchCoordinates)) {
-
-                        coincidence -= -1;
-                    }
-                }
-                if (coincidence <= 0) {
-                    data.add(0);
-                } else {
-                    data.add(coincidence);
-                    //System.out.println(coincidence);
-                    int x, y;
-                    for (int m = 0; m < matchCoordinates.size(); m++) {
-                        x = matchCoordinates.get(m)[0];
-                        y = matchCoordinates.get(m)[1];
-                        int[] colors = frames.get(i).getRGB(x, y, xTiles, yTiles, null, 0, xTiles);
-                        int r = 0, g = 0, b = 0;
-                        for (int c : colors) {
-                            r += ((c >> 16) & 0xFF);
-                            g += ((c >> 8) & 0xFF);
-                            b += (c & 0xFF);
-                        }
-                        int R = r / colors.length;
-                        int G = g / colors.length;
-                        int B = b / colors.length;
-
-                        int[] rgbArray = new int[(xTiles - 2) * (yTiles - 2)];
-                        Color c = new Color(R, G, B);
-
-                        Arrays.fill(rgbArray, c.getRGB());
-                        frames.get(i).setRGB(++x, ++y, xTiles - 2, yTiles - 2, rgbArray, 0, 0);
-                    }
-                }*/
-            } else {
-                // Código imagénes intracuadro - referencia
+            }
+            //Imagen de referencia
+            else{
                 reference = subdivideFrames(frames.get(i), xTiles, yTiles, rows, cols);
             }
         }
-        long elapsedTime = System.nanoTime() - startTime;
+        long elapsedTime = (System.currentTimeMillis() - startTime);
+        System.out.println("AOR> Encoded " + frames.size() + " frames in " + elapsedTime/1000F + " seconds");
         return data;
     }
 
+    /**
+     * Función para subdividir un frame en teselas
+     *
+     * @param frame -> Freme a tratar
+     * @param xTiles -> Teselas en el eje x
+     * @param yTiles -> Teselas en el eje y
+     * @param rows -> Numero de filas de la imagen
+     * @param cols -> Nuemro de columnas de la imagen
+     * @return BufferedImage[] subimage
+     */
     public BufferedImage[] subdivideFrames(BufferedImage frame, int xTiles, int yTiles, int rows, int cols) {
-        //int rows = frame.getWidth() / xTiles;
-        //int cols = frame.getHeight() / yTiles;
         int count = 0;
 
-        BufferedImage subimages[] = new BufferedImage[rows * cols]; //Image array to hold image chunks
+        BufferedImage subimages[] = new BufferedImage[rows * cols];
+        // Recorremos el frame i obtenemos las teselas
         for (int y = 0; y < frame.getHeight(); y += yTiles) {
             for (int x = 0; x < frame.getWidth(); x += xTiles) {
                 subimages[count] = frame.getSubimage(x, y, xTiles, yTiles);
@@ -357,6 +339,22 @@ public class FramesObject {
         return subimages;
     }
 
+    /**
+     * Función para buscar coincidencias entre frames
+     *
+     * @param nFrame -> Id el Frame a comparar
+     * @param frame -> Frame a comparar
+     * @param reference -> Frame de referencia
+     * @param xTiles -> Teselas en el eje x
+     * @param yTiles -> Teselas en el eje y
+     * @param quality -> Factor de calidad que determina cuando dos teselas son coincidentes
+     * @param rows -> Numero de filas de la imagen
+     * @param cols -> Nuemro de columnas de la imagen
+     * @param seekRange -> Desplazamiento maximo en la busqueda de teselas coincidentes
+     * @param d -> Catos a guardar
+     * @param c -> Coordenadas donde se encuentran las coincidencias
+     * @return boolean True si se ha encontrado alguna coincidencia, False en caso contrario
+     */
     private boolean findCoincidence(int nFrame, BufferedImage frame, BufferedImage reference, int xTiles,
                                     int yTiles, int quality, int rows, int cols, int seekRange, ArrayList<Integer> d,
                                     ArrayList<int[]> c) {
@@ -385,8 +383,9 @@ public class FramesObject {
 
         for (int y = yMin; y <= yMax - yTiles; y++) {
             for (int x = xMin; x <= xMax - xTiles; x++) {
-
+                // Buscamos coincidencias entre las teselas
                 double correlation = compareImages(frame.getSubimage(y, x, xTiles, yTiles), reference);
+                // Se usa el factor de calidad pasado por consola
                 if (correlation < quality) {
                     c.add(new int[]{y, x});
                     d.add(y);
@@ -400,6 +399,13 @@ public class FramesObject {
         return false;
     }
 
+    /**
+     * Función para comparar teselas
+     *
+     * @param image1
+     * @param image2
+     * @return double variation
+     */
     private double compareImages(BufferedImage image1, BufferedImage image2) {
         assert (image1.getHeight() == image2.getHeight() && image1.getWidth() == image2.getWidth());
         double variation = 0.0;
@@ -411,6 +417,13 @@ public class FramesObject {
         return variation / (image1.getWidth() * image2.getHeight());
     }
 
+    /**
+     * Funcionpara comparar dos colores
+     *
+     * @param rgb1
+     * @param rgb2
+     * @return double
+     */
     private double compareARGB(int rgb1, int rgb2) {
         double r1 = ((rgb1 >> 16) & 0xFF) / 255.0;
         double r2 = ((rgb2 >> 16) & 0xFF) / 255.0;
@@ -424,27 +437,57 @@ public class FramesObject {
         return a1 * a2 * Math.sqrt((r1 - r2) * (r1 - r2) + (g1 - g2) * (g1 - g2) + (b1 - b2) * (b1 - b2));
     }
 
+    /**
+     * Función para calcular la media de PSNR
+     *
+     * @param marks
+     * @return double media
+     */
+    private double calculateAverage(ArrayList<Double> marks) {
+        double sum = 0;
+        if(!marks.isEmpty()) {
+            for (Double mark : marks) {
+                sum += mark;
+            }
+            return sum / marks.size();
+        }
+        return sum;
+    }
+
+    /**
+     * Función para aplicar la codificación de la imágenes
+     *
+     * @param d -> Datos de teselacion
+     * @param fv -> Objecto FrameViewer
+     */
     public void decode(ArrayList<Integer> d, FramesViewer fv) {
 
         int counter = 0;
+        // ESTRUCTURA-> GOP xTile yTiles #Frame #Concidences:[x y #Frame, x y #Frame..] #Concidences:[x y #Frame, x y #Frame..] ..
+        //Recuperamos gop, xTiles, yTiles
         int gop = d.get(counter++);
         int xTiles = d.get(counter++);
         int yTiles = d.get(counter++);
+        // Inicializamos el thread para visualizar simultaneamente
         Thread t = new Thread(fv);
+        // Iniciamos el temporizador
+        long startTime = System.currentTimeMillis();
+        // Mientras no se haya llegado al final de fichero de datos
         while (counter < d.size()) {
             long start = System.currentTimeMillis();
+            //Recuperamos el id del frame i las coincidencias
             int nFrame = d.get(counter++);
-            //System.out.println(nFrame);
-            int coincidence = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-            //System.out.println(coincidence);
+            int coincidence = d.get(counter++);
             int rows = frames.get(nFrame).getWidth() / xTiles;
             int cols = frames.get(nFrame).getHeight() / yTiles;
-            //loop over matches
+            // Recorremos todas las coincidencias
             for (int i = 0; i < coincidence; i++) {
-                int y = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-                int x = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-                int nFrameC = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
+                //Recuperamos las posiciones x,y e id del fream de cada coincidencia
+                int y = d.get(counter++);
+                int x = d.get(counter++);
+                int nFrameC = d.get(counter++);
 
+                //Reconstruimos el frame con los datos recuperados
                 BufferedImage frameI = frames.get((nFrame / gop) * gop).getSubimage((nFrameC % rows) * xTiles, (nFrameC % cols) * yTiles, xTiles, yTiles);
                 for (int fy = 0; fy < frameI.getHeight(); fy++) {
                     for (int fx = 0; fx < frameI.getWidth(); fx++) {
@@ -452,19 +495,29 @@ public class FramesObject {
                         try {
                             frames.get(nFrame).setRGB(x * xTiles + fx, y * yTiles + fy, color);
                         } catch (Exception e) {
-                            //int asd = 21;
                         }
                     }
                 }
             }
+            // Si no hay instancia de FrameViewer, sen entiende que está seleccionada la opción de batch y, por ende,
+            // que no será necesaria la reproducción de los frames.
             if(fv != null) {
+                // En caso contrario se ejecuta el método run de la instancia en un thread separado.
+                // Para compensar el tiempo de procesado, se le pasa el tiempo que el codec ha necesitado para
+                // hacer el decode. Este delay se usa luego para muestrear las imágenes junto a los FPS.
                 fv.setDecodeDelay((int) (System.currentTimeMillis() - start));
                 fv.addImage(frames.get(nFrame));
                 if (fv.getImages().size() == 1)
                     t.start();
             }
         }
+        long elapsedTime = (System.currentTimeMillis() - startTime);
         d.clear();
-        System.out.println("@build -> Reconstruction DONE!");
+        ArrayList<Double> avgPSNR = new ArrayList<>();
+        System.out.println("AOR> Decoded " + frames.size() + " frames in " + elapsedTime/1000F + " seconds");
+        for(int i=1; i < frames.size(); i++){
+            avgPSNR.add(PSNR.calculate_PSNR(frames.get(i - 1), frames.get(i)));
+        }
+        System.out.println("AOR> Average PSNR is " + String.format("%.4f", calculateAverage(avgPSNR)));
     }
 }
