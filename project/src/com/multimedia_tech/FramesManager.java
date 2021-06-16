@@ -39,7 +39,7 @@ public class FramesManager {
     /**
      * Devuelve los datos para la descompresión, provinientes del fichero interno añadido duranta la compresión.
      *
-     * @return  array con los datos
+     * @return array con los datos
      */
     public ArrayList<Integer> getInData() {
         return inData;
@@ -68,7 +68,7 @@ public class FramesManager {
                 // Los datos, en la compresión, se serializan como enteros de 4 bytes.
                 byte[] buf = new byte[4];
                 int counter = inStr.read(buf);
-                while((counter != -1)) {
+                while ((counter != -1)) {
                     for (int i = 0; i < counter; i += 4) {
                         // Cada entero se lee como 4 bytes.
                         int value = buf[i] & 0xff | buf[i + 1] << 8 | buf[i + 2] << 16 | buf[i + 3] << 24;

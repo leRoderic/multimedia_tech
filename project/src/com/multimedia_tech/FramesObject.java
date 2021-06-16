@@ -241,7 +241,8 @@ public class FramesObject {
         ArrayList<int[]> matchCoordinates;
         ArrayList<Integer> data = new ArrayList();
         // ESTRUCTURA-> GOP xTile yTiles #Frame #Concidences:[x y #Frame, x y #Frame..] #Concidences:[x y #Frame, x y #Frame..] ..
-        //data.add(111);
+        // Guardamos valor mágico para integridad
+        data.add(12345);
         // Guardamos gop, xTiles, yTiles
         data.add(gop);
         data.add(xTiles);
@@ -464,6 +465,11 @@ public class FramesObject {
 
         int counter = 0;
         // ESTRUCTURA-> GOP xTile yTiles #Frame #Concidences:[x y #Frame, x y #Frame..] #Concidences:[x y #Frame, x y #Frame..] ..
+        // Revisamos valor de integridad
+        int magic = d.get(counter++);
+        if(magic != 12345){
+            System.err.println("AOR> Metadata integrity check failed.... File may be corrupted.");
+        }
         //Recuperamos gop, xTiles, yTiles
         int gop = d.get(counter++);
         int xTiles = d.get(counter++);
