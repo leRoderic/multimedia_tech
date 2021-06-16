@@ -15,9 +15,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FramesObject {
 
@@ -252,7 +249,7 @@ public class FramesObject {
         int coincidence = 0;
 
         BufferedImage[] reference = null;
-
+        long startTime = System.nanoTime();
         for (int i = 0; i < frames.size(); i++) {
             coincidence = 0;
             if (frames.get(i).getWidth() % xTiles != 0 || frames.get(i).getHeight() % yTiles != 0) {
@@ -340,6 +337,7 @@ public class FramesObject {
                 reference = subdivideFrames(frames.get(i), xTiles, yTiles, rows, cols);
             }
         }
+        long elapsedTime = System.nanoTime() - startTime;
         return data;
     }
 
@@ -432,8 +430,9 @@ public class FramesObject {
         int gop = d.get(counter++);
         int xTiles = d.get(counter++);
         int yTiles = d.get(counter++);
-
+        Thread t = new Thread(fv);
         while (counter < d.size()) {
+            long start = System.currentTimeMillis();
             int nFrame = d.get(counter++);
             //System.out.println(nFrame);
             int coincidence = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
@@ -445,11 +444,7 @@ public class FramesObject {
                 int y = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
                 int x = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
                 int nFrameC = d.get(counter++);//((d.get(counter++) & 0xff) | ((d.get(counter++) & 0xff) << 8));
-                /**
-                 (0,0) (0,1) (0,2) (0,3) (0,4)
-                 0     1     2     3     4
-                 (1,0) (1,1) (1,2) (1,3) (1,4)
-                 5     6     7     8     9  */
+
                 BufferedImage frameI = frames.get((nFrame / gop) * gop).getSubimage((nFrameC % rows) * xTiles, (nFrameC % cols) * yTiles, xTiles, yTiles);
                 for (int fy = 0; fy < frameI.getHeight(); fy++) {
                     for (int fx = 0; fx < frameI.getWidth(); fx++) {
@@ -457,12 +452,17 @@ public class FramesObject {
                         try {
                             frames.get(nFrame).setRGB(x * xTiles + fx, y * yTiles + fy, color);
                         } catch (Exception e) {
-                            int asd = 21;
+                            //int asd = 21;
                         }
                     }
                 }
             }
-            fv.addImage(frames.get(nFrame));
+            if(fv != null) {
+                fv.setDecodeDelay((int) (System.currentTimeMillis() - start));
+                fv.addImage(frames.get(nFrame));
+                if (fv.getImages().size() == 1)
+                    t.start();
+            }
         }
         d.clear();
         System.out.println("@build -> Reconstruction DONE!");

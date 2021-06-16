@@ -48,35 +48,20 @@ public class FramesManager {
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             InputStream inStr = f.getInputStream(entry);
-            if (entry.getName().contains(".txt")) {
-                /*System.out.println(entry.getName());
-                Scanner sc = new Scanner(inStr);
-                while(sc.hasNext()){
-                    System.out.println(sc.next());
-                }
-                int asd =23;*/
-
-                /*byte[] buf = new byte[1024];
-                int counter = inStr.read(buf);
-                while((counter != -1)){
-                    for(int i=0; i < counter; i++){
-                        inData.add((int)buf[i] & 0xff);
-                        System.out.println(buf[i]);
-                    }
-                    counter = inStr.read(buf);
-                }*/
+            if (entry.getName().contains(".data")) {
+                // Leemos el fichero de datos mediante arrays de 4 bytes para cada int
                 byte[] buf = new byte[4];
                 int counter = inStr.read(buf);
                 while((counter != -1)) {
                     for (int i = 0; i < counter; i += 4) {
                         int value = buf[i] & 0xff | buf[i + 1] << 8 | buf[i + 2] << 16 | buf[i + 3] << 24;
                         inData.add(value);
-                        System.out.println(value);
                     }
                     counter = inStr.read(buf);
                 }
 
             } else {
+                // Leemos las imagenes
                 BufferedImage img = ImageIO.read(inStr);
                 imageNames.add(entry.getName());
                 images.put(entry.getName(), img);
@@ -122,20 +107,10 @@ public class FramesManager {
             tempImage.delete();
         }
 
-
-        /*ZipEntry f = new ZipEntry("aor.txt");
-        zipOS.putNextEntry(f);
-        for (int i = 0; i < data.size(); i++) {
-            zipOS.write((int)data.get(i));
-        }
-        zipOS.closeEntry();*/
-
-
-        ZipEntry f = new ZipEntry("aor.txt");
+        ZipEntry f = new ZipEntry("aor.data");
         zipOS.putNextEntry(f);
 
-        for (int i = 0; i < data.size(); i++) {
-            //d[i] = data.get(i).byteValue();
+        for (int i = 0; i < data.si
             byte d[] = new byte[4];
             d[0] = (byte) (data.get(i) >> 0);
             d[1] = (byte) (data.get(i) >> 8);

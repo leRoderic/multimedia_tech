@@ -13,29 +13,39 @@ public class FramesViewer extends JFrame implements Runnable {
     private ArrayList<BufferedImage> images;
     public JLabel window;
     private String framesTitle;
+    private boolean decode;
+    private int decodeDelay;
 
-    public FramesViewer(FramesObject fo, int framesPerSecond, boolean decode){
-        if(!decode){
+    public FramesViewer(FramesObject fo, int framesPerSecond, boolean d){
+        if(!d){
             images = fo.getFrames();
         }else{
             images = new ArrayList<>();
         }
+        decode = d;
         framesTitle = fo.getName();
         fps = framesPerSecond;
         window = new JLabel();
     }
 
+    public ArrayList<BufferedImage> getImages(){
+        return images;
+    }
+
+    public void setDecodeDelay (int d){
+        decodeDelay = d;
+    }
+
     public void addImage(BufferedImage b){
+        //window.setIcon(new ImageIcon(b));
         images.add(b);
-        if(images.size() == 1)
-            run();
     }
 
     /**
      * Función para configurar el JFrame que contendrá la reproducción
      *
      */
-    private void configWindow(){
+    public void configWindow(){
         // Establecemos titulo para la ventana y el frame a mostrar
         setTitle("Reproducing " + framesTitle + " at " + fps + " FPS");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -53,14 +63,24 @@ public class FramesViewer extends JFrame implements Runnable {
      * Función para configurar la reproducción con los FPS introducidos por el usuario
      *
      */
-    private void reproduce(){
-        for(BufferedImage i: images){
-            window.setIcon(new ImageIcon(i));
-            try{
-                TimeUnit.MILLISECONDS.sleep(1000 / fps);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private void reproduce() {
+        int index = 0;
+        while (index < images.size()) {
+            window.setIcon(new ImageIcon(images.get(index)));
+            if(!decode) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(1000 / fps);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                try {
+                    Thread.sleep((1000 / fps) + decodeDelay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+            index++;
         }
     }
 

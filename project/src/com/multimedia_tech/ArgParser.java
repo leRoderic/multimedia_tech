@@ -121,9 +121,6 @@ public class ArgParser {
     }
 
     public int getAVGFilterValue() {
-        if(avg == 0){
-            return 5;
-        }
         return avg;
     }
 

@@ -47,18 +47,24 @@ public class Main {
             if(parser.getEncodeOption()){
                 List<Integer> dTiles = parser.getTesselationValues();
                 ArrayList<Integer> ret =  fo.encode(parser.getGOP(), parser.getSeekRange(), parser.getQuality(), dTiles.get(0), dTiles.get(1));
-                fo.applyMeanFilter(parser.getAVGFilterValue());
+                fo.applyMeanFilter(5);
                 fm.saveImagesToZip(parser.getOutputPath(), ret);
             }else{
                 if(parser.getDecodeOption()){
-                    fo.decode(fm.getInData(), new FramesViewer(fo, fps, true));
+                    FramesViewer fv;
+                    if(parser.getBatchOption()) {
+                        fv = null;
+                    }else{
+                        fv = new FramesViewer(fo, fps, true);
+                    }
+                    fo.decode(fm.getInData(), fv);
                 }else {
                     if(!parser.getBatchOption()) {
                         new FramesViewer(fo, fps, false).run();
                     }
-                    if (parser.getOutputPath() != null) {
-                        fm.saveImagesToZip(parser.getOutputPath());
-                    }
+                }
+                if (parser.getOutputPath() != null) {
+                    fm.saveImagesToZip(parser.getOutputPath());
                 }
             }
         }catch (ParameterException | IOException pex){
